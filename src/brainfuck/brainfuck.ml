@@ -17,3 +17,15 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 *)
+
+let code file =
+    let lines = ref []
+    try
+        let io = open_in file in
+        let line = input_line io in
+        while true; do
+            lines := input_line line :: !lines
+        done; !lines
+    with End_of_file ->
+        close_in line;
+        List.rev !lines;;
