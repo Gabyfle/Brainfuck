@@ -1,6 +1,6 @@
 (* 
-    Brainfuck interpreter
-    brainfuck.ml
+    Util functions
+    util.mli
 
 
     Copyright 2019 Gabriel Santamaria
@@ -18,4 +18,15 @@
     limitations under the License.
 *)
 
-let file_path = Sys.argv.(1) (* 1st argument in the command line have to be the filepath *)
+(*
+    function sconcat
+    concatenate every elements of a list. works only for strings elements
+*)
+let rec sconcat l =
+    try
+        let string = ref "" in
+        match l with
+        | [] -> !string
+        | s :: r -> string := String.concat "" [!string; s]; sconcat r
+    with e ->
+        ()
