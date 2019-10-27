@@ -21,12 +21,16 @@
 (*
     function sconcat
     concatenate every elements of a list. works only for strings elements
+    list -> string
 *)
-let rec sconcat l =
+let sconcat l =
     try
-        let string = ref "" in
-        match l with
-        | [] -> !string
-        | s :: r -> string := String.concat "" [!string; s]; sconcat r
+        let str = ref "" in
+        let rec concatenate l = 
+            match l with
+            | [] -> !str
+            | s :: r -> str := String.concat "" [!str; s]; concatenate r
+        in
+        concatenate l
     with e ->
         ()

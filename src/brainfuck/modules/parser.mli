@@ -18,11 +18,17 @@
     limitations under the License.
 *)
 
-(*
-    function code
-    gets code from a file
+(* 
+    List of Brainfuck instructions, everything else is ignored
 *)
-let code file =
+let instructions = [ "+"; "-"; "<"; ">"; "["; "]"; ","; "." ]
+
+(*
+    function get_code
+    gets code from a file
+    string -> list
+*)
+let get_code file =
     let lines = ref []
     try
         let io = open_in file in
@@ -35,7 +41,13 @@ let code file =
         List.rev !lines
 
 (*
-    function validate
-    validate a brainfuck code
+    function clear_code
+    clear code from every comments
+    string -> string
 *)
-let validate code =
+let clear_code code =
+    let str = ref "" in
+    let is_instruction element =
+        if 
+
+    String.iter is_instruction element
