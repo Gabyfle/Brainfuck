@@ -24,13 +24,10 @@
     list -> string
 *)
 let sconcat l =
-    try
-        let str = ref "" in
-        let rec concatenate l = 
-            match l with
-            | [] -> !str
-            | s :: r -> str := String.concat "" [!str; s]; concatenate r
-        in
-        concatenate l
-    with e ->
-        ()
+    let str = ref "" in
+    let rec concatenate l = 
+        match l with
+        | [] -> !str
+        | s :: r -> str := String.concat "" [!str; s]; concatenate r
+    in
+    concatenate l

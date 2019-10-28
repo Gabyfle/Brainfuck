@@ -21,7 +21,7 @@
 (* 
     List of Brainfuck instructions, everything else is ignored
 *)
-let instructions = [ "+"; "-"; "<"; ">"; "["; "]"; ","; "." ]
+let instructions = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
 
 (*
     function get_code
@@ -48,6 +48,7 @@ let get_code file =
 let clear_code code =
     let str = ref "" in
     let is_instruction element =
-        if 
-
-    String.iter is_instruction element
+        if List.mem element instructions then str := !str ^ (Char.escaped element)
+    in
+    String.iter is_instruction code;
+    !str
