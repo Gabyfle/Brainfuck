@@ -1,6 +1,6 @@
 (* 
-    Brainfuck interpreter
-    brainfuck.ml
+    Brainfuck parser
+    parser.mli
 
 
     Copyright 2019 Gabriel Santamaria
@@ -18,5 +18,6 @@
     limitations under the License.
 *)
 
-let file_path = Sys.argv.(1) (* 1st argument in the command line have to be the filepath *)
-
+(* Parser module *)
+val instructions : char list
+val clear_code : string -> string

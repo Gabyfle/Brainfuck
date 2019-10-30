@@ -1,2 +1,4 @@
-
-node_modules/.lsp/debug.log
+src/node_modules
+node_modules/
+*.cmi
+*.cmo

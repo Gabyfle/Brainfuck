@@ -1,6 +1,6 @@
 (* 
-    Brainfuck interpreter
-    brainfuck.ml
+    Util functions
+    util.mli
 
 
     Copyright 2019 Gabriel Santamaria
@@ -18,5 +18,5 @@
     limitations under the License.
 *)
 
-let file_path = Sys.argv.(1) (* 1st argument in the command line have to be the filepath *)
-
+(* Util functions module *)
+val get_code : string -> string list

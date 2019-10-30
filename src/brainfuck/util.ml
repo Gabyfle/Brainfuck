@@ -1,6 +1,6 @@
 (* 
-    Brainfuck parser
-    parser.mli
+    Util functions
+    util.mli
 
 
     Copyright 2019 Gabriel Santamaria
@@ -18,37 +18,19 @@
     limitations under the License.
 *)
 
-(* 
-    List of Brainfuck instructions, everything else is ignored
-*)
-let instructions = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
-
+(* Util functions module *)
 (*
     function get_code
     gets code from a file
-    string -> list
+    string -> string list
 *)
 let get_code file =
-    let lines = ref []
+    let lines = ref [] in
+    let io = open_in file in
     try
-        let io = open_in file in
-        let line = input_line io in
         while true; do
-            lines := input_line line :: !lines
+            lines := input_line io :: !lines
         done; !lines
     with End_of_file ->
-        close_in line;
+        close_in io;
         List.rev !lines
-
-(*
-    function clear_code
-    clear code from every comments
-    string -> string
-*)
-let clear_code code =
-    let str = ref "" in
-    let is_instruction element =
-        if List.mem element instructions then str := !str ^ (Char.escaped element)
-    in
-    String.iter is_instruction code;
-    !str

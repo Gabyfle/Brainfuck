@@ -1,6 +1,6 @@
 (* 
-    Util functions
-    util.mli
+    Brainfuck parser
+    parser.ml
 
 
     Copyright 2019 Gabriel Santamaria
@@ -18,16 +18,19 @@
     limitations under the License.
 *)
 
+(* Parser module *)
+(* List of Brainfuck instructions, everything else is ignored *)
+let instructions = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
+
 (*
-    function sconcat
-    concatenate every elements of a list. works only for strings elements
-    list -> string
+    function clear_code
+    clear code from every comments
+    string -> string
 *)
-let sconcat l =
+let clear_code code =
     let str = ref "" in
-    let rec concatenate l = 
-        match l with
-        | [] -> !str
-        | s :: r -> str := String.concat "" [!str; s]; concatenate r
+    let is_instruction element =
+        if List.mem element instructions then str := !str ^ (Char.escaped element)
     in
-    concatenate l
+    String.iter is_instruction code;
+    !str
