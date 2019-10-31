@@ -19,5 +19,9 @@
 *)
 
 (* Parser module *)
-val instructions : char list
+type instructions
+val intrc : char list
+val type_to_char : instructions -> char
+val char_to_type : char -> instructions
 val clear_code : string -> string
+val parse : string -> instructions list

@@ -19,8 +19,51 @@
 *)
 
 (* Parser module *)
+(* Enumeration of Brainfuck instructions, everything else is ignored *)
+type instructions =
+    | IPointer  (* Incrementing pointer *)
+    | DPointer  (* Decrementing pointer *)
+    | IByte     (* Incrementing pointer the byte at the pointer *)
+    | DByte     (* Decrementing pointer the byte at the pointer *)
+    | Out       (* Printing the byte at the pointer *)
+    | In        (* Get one byte at the pointer *)
+    | SLoop     (* Starts looping *)
+    | ELoop     (* Ends looping *)
 (* List of Brainfuck instructions, everything else is ignored *)
-let instructions = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
+let intrc = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
+
+(*
+    function type_to_char
+    transform a type into a char instruction
+    instructions -> char
+*)
+let type_to_char t = 
+    match t with
+    | IPointer -> '>'
+    | DPointer -> '<'
+    | IByte    -> '+'
+    | DByte    -> '-'
+    | Out      -> '.'
+    | In       -> ','
+    | SLoop    -> '['
+    | ELoop    -> ']'
+
+(*
+    function char_to_type
+    transform a brainfuck char into a type
+    char -> instruction
+*)
+let char_to_type c =
+    match c with
+    | '>' -> IPointer
+    | '<' -> DPointer
+    | '+' -> IByte
+    | '-' -> DByte
+    | '.' -> Out
+    | ',' -> In
+    | '[' -> SLoop
+    | ']' -> ELoop
+    | _ -> raise (Invalid_argument "invalid instruction")
 
 (*
     function clear_code
@@ -30,7 +73,20 @@ let instructions = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
 let clear_code code =
     let str = ref "" in
     let is_instruction element =
-        if List.mem element instructions then str := !str ^ (Char.escaped element)
+        if List.mem element intrc then str := !str ^ (Char.escaped element)
     in
     String.iter is_instruction code;
     !str
+
+(*
+    function parse
+    convert a brainfuck string into a list of instructions
+    string -> instructions list
+*)
+let parse code = 
+    let program = ref [] in
+    let parser chr =
+        program := !program @ [(char_to_type chr)]
+    in
+    String.iter parser code;
+    !program
