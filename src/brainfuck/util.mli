@@ -20,3 +20,4 @@
 
 (* Util functions module *)
 val get_code : string -> string list
+val sconcat : string list -> string

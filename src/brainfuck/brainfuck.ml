@@ -19,4 +19,21 @@
 *)
 
 let file_path = Sys.argv.(1) (* 1st argument in the command line have to be the filepath *)
+let code = ref file_path
 
+let () =
+    if (file_exists file_path) then code := Util.sconcat (Util.get_code file_path);
+
+    let execute code =
+        let start = (times ()).tms_utime in
+        let array = Array.make max_int 0 in
+        let ptr = ref 0 in
+        let eval c =
+            match c with
+                | IPointer -> ptr := succ !ptr
+                | DPointer -> ptr := pred !ptr
+                | IByte -> array.(!ptr) <- (succ !ptr)
+                | DByte -> array.(!ptr) <- (pred !ptr)
+                | Out -> Printf.printf "%c" (array.(!ptr))
+                | In -> array.(!ptr) <- Scanf.scanf " %d" (fun x -> x)
+    (* TODO *)

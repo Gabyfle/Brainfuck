@@ -34,3 +34,17 @@ let get_code file =
     with End_of_file ->
         close_in io;
         List.rev !lines
+
+(*
+    function sconcat
+    Concat a string list into a string
+    string list -> string
+*)
+let sconcat l =
+    let str = ref "" in
+    let rec concatenate l = 
+        match l with
+        | [] -> !str
+        | s :: r -> str := String.concat "" [!str; s]; concatenate r
+    in
+    concatenate l
