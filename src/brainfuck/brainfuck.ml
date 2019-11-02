@@ -21,19 +21,28 @@
 let file_path = Sys.argv.(1) (* 1st argument in the command line have to be the filepath *)
 let code = ref file_path
 
-let () =
-    if (file_exists file_path) then code := Util.sconcat (Util.get_code file_path);
+let execute code =
+    let start = (times ()).tms_utime in (* for performances recording purpose *)
+    let table = Array.make max_int 0 in
+    let ptr = ref 0 in
+    let rec eval pos c =
+        match c with
+            | IPointer -> ptr := succ !ptr
+            | DPointer -> ptr := pred !ptr
+            | IByte -> table.(!ptr) <- (succ !ptr)
+            | DByte -> table.(!ptr) <- (pred !ptr)
+            | Out -> Printf.printf "%c" (table.(!ptr))
+            | In -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x)
+            | SLoop ->
+                if table.(pos) = 0 then
+                    ()
+                else
+                    
+            | ELoop ->
+                if table.(pos) = 0 then
+                    ()
+                else
+                    
 
-    let execute code =
-        let start = (times ()).tms_utime in
-        let array = Array.make max_int 0 in
-        let ptr = ref 0 in
-        let eval c =
-            match c with
-                | IPointer -> ptr := succ !ptr
-                | DPointer -> ptr := pred !ptr
-                | IByte -> array.(!ptr) <- (succ !ptr)
-                | DByte -> array.(!ptr) <- (pred !ptr)
-                | Out -> Printf.printf "%c" (array.(!ptr))
-                | In -> array.(!ptr) <- Scanf.scanf " %d" (fun x -> x)
-    (* TODO *)
+let () =
+    if (Sys.file_exists file_path) then code := Util.sconcat (Util.get_code file_path);

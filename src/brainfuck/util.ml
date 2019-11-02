@@ -48,3 +48,27 @@ let sconcat l =
         | s :: r -> str := String.concat "" [!str; s]; concatenate r
     in
     concatenate l
+
+(*
+    function findi_from
+    Finds the first occurence of needle from start in list and return its position
+    'a list -> 'a -> 'a -> int
+*)
+let findi_from list start needle =
+   (*
+    *   A kind of "helper" function which trim the n first values of a list
+    *)
+    let rec trimi list n = match list, n with
+        | l, 0 -> l
+        | [], _ -> failwith "list elements number is less than n"
+        | s :: r, n -> trimi r (n - 1)
+    in
+    let nlist = (trimi list start) in (* A new list derived from list but starting at list.(start) (so length(nlist) = length(list) - start) *)
+    let index = ref 0 in
+    let rec find list needle =
+        match list with
+            | [] -> failwith "you gived an empty list"
+            | s :: r when s = needle -> !index
+            | s :: r -> index := (succ !index); find r needle
+    in
+    find nlist needle
