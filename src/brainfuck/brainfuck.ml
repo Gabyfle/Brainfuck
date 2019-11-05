@@ -21,7 +21,7 @@
 let file_path = Sys.argv.(1) (* 1st argument in the command line have to be the filepath *)
 let code = ref file_path
 
-let execute code =
+let execute (code: string) =
     let start = (times ()).tms_utime in (* for performances recording purpose *)
     let table = Array.make max_int 0 in
     let ptr = ref 0 in

@@ -70,7 +70,7 @@ let char_to_type c =
     clear code from every comments
     string -> string
 *)
-let clear_code code =
+let clear_code (code: string) =
     let str = ref "" in
     let is_instruction element =
         if List.mem element intrc then str := !str ^ (Char.escaped element)
@@ -83,7 +83,7 @@ let clear_code code =
     convert a brainfuck string into a list of instructions
     string -> instructions list
 *)
-let parse code = 
+let parse (code: string) = 
     let program = ref [] in
     let parser chr =
         program := !program @ [(char_to_type chr)]
