@@ -25,23 +25,30 @@ let execute (code: string) =
     let start = (times ()).tms_utime in (* for performances recording purpose *)
     let table = Array.make max_int 0 in
     let ptr = ref 0 in
-    let rec eval pos c =
-        match c with
-            | IPointer -> ptr := succ !ptr
-            | DPointer -> ptr := pred !ptr
-            | IByte -> table.(!ptr) <- (succ !ptr)
-            | DByte -> table.(!ptr) <- (pred !ptr)
-            | Out -> Printf.printf "%c" (table.(!ptr))
-            | In -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x)
+    let rec eval pos =
+        match instructs.(pos) with
+            | IPointer -> ptr := incr ptr; eval (pos + 1)
+            | DPointer -> ptr := decr ptr; eval (pos + 1)
+            | IByte -> table.(!ptr) <- (incr ptr); eval (pos + 1)
+            | DByte -> table.(!ptr) <- (decr ptr); eval (pos + 1)
+            | Out -> Printf.printf "%c" (table.(!ptr)); eval (pos + 1)
+            | In -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x); eval (pos + 1)
             | SLoop ->
-                if table.(pos) = 0 then
-                    ()
-                else
+                if table.(!ptr) = 0 then
+                    eval (pos + 1)
+                else begin
                     
+                    while table.(!ptr) != 0 do
+                        eval 
+                    done
+                end
             | ELoop ->
-                if table.(pos) = 0 then
-                    ()
+                if table.(!ptr) = 0 then
+                    eval (pos + 1)
                 else
+                    () (* do nothing *)
+    in
+    eval 
                     
 
 let () =
