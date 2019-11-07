@@ -21,49 +21,53 @@
 (* Parser module *)
 (* Enumeration of Brainfuck instructions, everything else is ignored *)
 type instructions =
-    | IPointer  (* Incrementing pointer *)
-    | DPointer  (* Decrementing pointer *)
-    | IByte     (* Incrementing pointer the byte at the pointer *)
-    | DByte     (* Decrementing pointer the byte at the pointer *)
-    | Out       (* Printing the byte at the pointer *)
-    | In        (* Get one byte at the pointer *)
-    | SLoop     (* Starts looping *)
-    | ELoop     (* Ends looping *)
+    | IPointer                    (* Incrementing pointer *)
+    | DPointer                    (* Decrementing pointer *)
+    | IByte                       (* Incrementing pointer the byte at the pointer *)
+    | DByte                       (* Decrementing pointer the byte at the pointer *)
+    | Out                         (* Printing the byte at the pointer *)
+    | In                          (* Get one byte at the pointer *)
+    | Loop of instructions list   (* A loop *)
 (* List of Brainfuck instructions, everything else is ignored *)
 let intrc = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
 
 (*
-    function type_to_char
-    transform a type into a char instruction
-    instructions -> char
+    function type_to_str
+    transform a type list into a char instruction
+    instructions list -> string
 *)
-let type_to_char t = 
-    match t with
-    | IPointer -> '>'
-    | DPointer -> '<'
-    | IByte    -> '+'
-    | DByte    -> '-'
-    | Out      -> '.'
-    | In       -> ','
-    | SLoop    -> '['
-    | ELoop    -> ']'
+let rec type_to_str (instr: instructions list) = 
+    let str = ref "" in
+    let rec parse (instr: instructions) =
+        match instr with
+            | IPointer -> str := !str ^ ">"
+            | DPointer -> str := !str ^ "<"
+            | IByte    -> str := !str ^ "+"
+            | DByte    -> str := !str ^ "-"
+            | Out      -> str := !str ^ "."
+            | In       -> str := !str ^ ","
+            | Loop(l)  -> str := !str ^ ("[" ^ (type_to_str l) ^ "]")
+    in
+    match instr with
+        | [] -> !str
+        | s :: r -> (parse s); type_to_str (r)
 
 (*
-    function char_to_type
-    transform a brainfuck char into a type
-    char -> instruction
+    function str_to_type
+    transform a brainfuck string into a type
+    string -> instruction list
 *)
-let char_to_type c =
-    match c with
-    | '>' -> IPointer
-    | '<' -> DPointer
-    | '+' -> IByte
-    | '-' -> DByte
-    | '.' -> Out
-    | ',' -> In
-    | '[' -> SLoop
-    | ']' -> ELoop
-    | _ -> raise (Invalid_argument "invalid instruction")
+let str_to_type (str: string) =
+    match str with
+        | '>' -> IPointer
+        | '<' -> DPointer
+        | '+' -> IByte
+        | '-' -> DByte
+        | '.' -> Out
+        | ',' -> In
+        | '[' -> SLoop
+        | ']' -> ELoop
+        | _ -> raise (Invalid_argument "invalid instruction")
 
 (*
     function clear_code
@@ -83,7 +87,7 @@ let clear_code (code: string) =
     convert a brainfuck string into a list of instructions
     string -> instructions list
 *)
-let parse (code: string) = 
+let parse (code: string) =
     let program = ref [] in
     let parser chr =
         program := !program @ [(char_to_type chr)]
