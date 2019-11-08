@@ -21,3 +21,5 @@
 (* Util functions module *)
 val get_code : string -> string list
 val sconcat : string list -> string
+val findi_from : 'a list -> 'a -> 'a -> int
+val explode : string -> char list

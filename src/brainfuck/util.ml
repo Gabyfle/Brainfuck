@@ -67,9 +67,20 @@ let findi_from (lst: 'a list) (start: 'a) (needle: 'a) =
     let index = ref 0 in
     let rec find l needle =
         match l with
-            | [] -> failwith "you gived an empty list"
+            | [] -> failwith "we can't find needle"
             | s :: r when s = needle -> !index
             | s :: r -> index := (incr index); find r needle
     in
     find nlst needle
 
+(*
+    function explode
+    Explode a string into a list of chars
+    string -> char list
+*)
+let explode string =
+    let rec xpld i list =
+        if i < 0 then list
+        else xpld (i - 1) (string.[i] :: list)
+    in
+    xpld (String.length string) []

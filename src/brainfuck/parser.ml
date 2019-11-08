@@ -55,7 +55,7 @@ let rec type_to_str (instr: instructions list) =
 (*
     function str_to_type
     transform a brainfuck string into a type
-    string -> instruction list
+    string -> instructions
 *)
 let str_to_type (str: string) =
     match str with
@@ -65,8 +65,6 @@ let str_to_type (str: string) =
         | '-' -> DByte
         | '.' -> Out
         | ',' -> In
-        | '[' -> SLoop
-        | ']' -> ELoop
         | _ -> raise (Invalid_argument "invalid instruction")
 
 (*
@@ -88,9 +86,14 @@ let clear_code (code: string) =
     string -> instructions list
 *)
 let parse (code: string) =
-    let program = ref [] in
-    let parser chr =
-        program := !program @ [(char_to_type chr)]
+    let estring = (Util.explode string) in (* exploded string *)
+    let rec parser (cl: char list) (program: instructions list) =
+        match cl with
+            | [] -> program
+            | s :: r -> begin
+                match s with
+                    | '[' -> findi_from 
+                    | ']'
+            end
     in
-    String.iter parser code;
-    !program
+    parser estring
