@@ -18,38 +18,49 @@
     limitations under the License.
 *)
 
+open Util
+open Parser
+
+type instructions =
+    | IPointer                    (* Incrementing pointer *)
+    | DPointer                    (* Decrementing pointer *)
+    | IByte                       (* Incrementing pointer the byte at the pointer *)
+    | DByte                       (* Decrementing pointer the byte at the pointer *)
+    | Out                         (* Printing the byte at the pointer *)
+    | In                          (* Get one byte at the pointer *)
+    | Loop of instructions list   (* A loop *)
+
 let file_path = Sys.argv.(1) (* 1st argument in the command line have to be the filepath *)
 let code = ref file_path
 
-let execute (code: string) =
-    let start = (times ()).tms_utime in (* for performances recording purpose *)
+(*
+    function execute
+    Execute the Brainfuck code from an already parsed string and returns the time it tooks
+    instructions list -> int
+*)
+let execute (instructs: instructions list) =
+    let start = (Sys.time ()) in (* for performances recording purpose *)
     let table = Array.make max_int 0 in
     let ptr = ref 0 in
-    let rec eval pos =
-        match instructs.(pos) with
-            | IPointer -> ptr := incr ptr; eval (pos + 1)
-            | DPointer -> ptr := decr ptr; eval (pos + 1)
-            | IByte -> table.(!ptr) <- (incr ptr); eval (pos + 1)
-            | DByte -> table.(!ptr) <- (decr ptr); eval (pos + 1)
-            | Out -> Printf.printf "%c" (table.(!ptr)); eval (pos + 1)
-            | In -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x); eval (pos + 1)
-            | SLoop ->
-                if table.(!ptr) = 0 then
-                    eval (pos + 1)
-                else begin
-                    
-                    while table.(!ptr) != 0 do
-                        eval 
-                    done
-                end
-            | ELoop ->
-                if table.(!ptr) = 0 then
-                    eval (pos + 1)
-                else
-                    () (* do nothing *)
+    let rec eval instructs =
+        match instructs with
+            | [] -> ()
+            | s :: r -> begin
+                match s with
+                    | IPointer -> incr ptr; eval r
+                    | DPointer -> decr ptr; eval r
+                    | IByte -> table.(!ptr) <- succ table.(!ptr); eval r
+                    | DByte -> table.(!ptr) <- pred table.(!ptr); eval r
+                    | Out -> Printf.printf "%c" (char_of_int table.(!ptr)); eval r
+                    | In -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x); eval r
+                    | Loop(l) -> 
+                        while table.(!ptr) <> 0 do
+                            eval l
+                        done
+            end
     in
-    eval 
-                    
+    eval instructs;
+    Sys.time () - start
 
 let () =
     if (Sys.file_exists file_path) then code := Util.sconcat (Util.get_code file_path);

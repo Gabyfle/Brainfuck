@@ -50,26 +50,28 @@ let sconcat (l: string list) =
     concatenate l
 
 (*
+    function trimi
+    Trim the first n elements of a list
+    'a list -> int -> 'a list
+*)
+let rec trimi list n = match list, n with
+    | l, 0 -> l
+    | [], n when n > 0 -> raise Not_found
+    | s :: r, n -> trimi r (n - 1)
+
+(*
     function findi_from
     Finds the first occurence of needle from start in list and return its position
-    'a list -> 'a -> 'a -> int
+    'a list -> int -> 'a -> int
 *)
-let findi_from (lst: 'a list) (start: 'a) (needle: 'a) =
-   (*
-    *   A kind of "helper" function which trim the n first values of a list
-    *)
-    let rec trimi l n = match list, n with
-        | l, 0 -> l
-	    | [], n when n > 0 -> failwith "list elements number is less than n"
-        | s :: r, n -> trimi r (n - 1)
-    in
+let findi_from (lst: 'a list) (start: int) (needle: 'a) =
     let nlst = (trimi lst start) in (* A new list derived from list but starting at list.(start) (so length(nlist) = length(list) - start) *)
     let index = ref 0 in
     let rec find l needle =
         match l with
-            | [] -> failwith "we can't find needle"
+            | [] -> raise Not_found
             | s :: r when s = needle -> !index
-            | s :: r -> index := (incr index); find r needle
+            | s :: r -> incr index; find r needle
     in
     find nlst needle
 

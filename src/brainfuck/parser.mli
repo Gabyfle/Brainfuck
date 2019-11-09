@@ -21,7 +21,7 @@
 (* Parser module *)
 type instructions
 val intrc : char list
-val type_to_char : instructions -> char
+val type_to_str : instructions list -> string
 val char_to_type : char -> instructions
 val clear_code : string -> string
 val parse : string -> instructions list

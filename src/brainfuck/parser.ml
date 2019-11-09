@@ -53,12 +53,12 @@ let rec type_to_str (instr: instructions list) =
         | s :: r -> (parse s); type_to_str (r)
 
 (*
-    function str_to_type
-    transform a brainfuck string into a type
-    string -> instructions
+    function char_to_type
+    transform a brainfuck char into a type
+    char -> instructions
 *)
-let str_to_type (str: string) =
-    match str with
+let char_to_type (c: char) =
+    match c with
         | '>' -> IPointer
         | '<' -> DPointer
         | '+' -> IByte
@@ -86,14 +86,18 @@ let clear_code (code: string) =
     string -> instructions list
 *)
 let parse (code: string) =
-    let estring = (Util.explode string) in (* exploded string *)
+    let estring = (Util.explode code) in (* exploded string *)
     let rec parser (cl: char list) (program: instructions list) =
         match cl with
             | [] -> program
             | s :: r -> begin
                 match s with
-                    | '[' -> findi_from 
-                    | ']'
+                    | c when c = '[' -> 
+                        let loop = (parser r []) in
+                        let ncl = Util.trimi r (List.length loop) in
+                        parser ncl (program @ loop)
+                    | c when c = ']' -> program
+                    | _ -> parser r program
             end
     in
-    parser estring
+    parser estring []
