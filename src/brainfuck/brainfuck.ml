@@ -21,16 +21,7 @@
 open Util
 open Parser
 
-type instructions =
-    | IPointer                    (* Incrementing pointer *)
-    | DPointer                    (* Decrementing pointer *)
-    | IByte                       (* Incrementing pointer the byte at the pointer *)
-    | DByte                       (* Decrementing pointer the byte at the pointer *)
-    | Out                         (* Printing the byte at the pointer *)
-    | In                          (* Get one byte at the pointer *)
-    | Loop of instructions list   (* A loop *)
-
-let file_path = Sys.argv.(1) (* 1st argument in the command line have to be the filepath *)
+let file_path = Sys.argv.(0) (* 1st argument in the command line have to be the filepath *)
 let code = ref file_path
 
 (*
@@ -60,7 +51,9 @@ let execute (instructs: instructions list) =
             end
     in
     eval instructs;
-    Sys.time () - start
+    Sys.time () -. start
 
 let () =
-    if (Sys.file_exists file_path) then code := Util.sconcat (Util.get_code file_path);
+    if (Sys.file_exists file_path) then code := sconcat (get_code file_path);
+    let program = parse !code in
+    Printf.printf "Executed in : %f seconds" (execute program)

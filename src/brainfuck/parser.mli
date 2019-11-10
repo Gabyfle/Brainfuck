@@ -19,7 +19,15 @@
 *)
 
 (* Parser module *)
-type instructions
+(* Enumeration of Brainfuck instructions, everything else is ignored *)
+type instructions =
+    | IPointer                    (* Incrementing pointer *)
+    | DPointer                    (* Decrementing pointer *)
+    | IByte                       (* Incrementing pointer the byte at the pointer *)
+    | DByte                       (* Decrementing pointer the byte at the pointer *)
+    | Out                         (* Printing the byte at the pointer *)
+    | In                          (* Get one byte at the pointer *)
+    | Loop of instructions list   (* A loop *)
 val intrc : char list
 val type_to_str : instructions list -> string
 val char_to_type : char -> instructions
