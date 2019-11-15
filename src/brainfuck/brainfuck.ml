@@ -22,7 +22,7 @@ open Util
 open Parser
 
 let file_path = Sys.argv.(0) (* 1st argument in the command line have to be the filepath *)
-let code = ref file_path
+let code = ref "++++++++[>++++[>++>+++>+++>+<<<<-]>+>->+>>+[<]<-]>>.>>---.+++++++..+++.>.<<-.>.+++.------.--------.>+.>++."
 
 (*
     function execute
@@ -31,7 +31,7 @@ let code = ref file_path
 *)
 let execute (instructs: instructions list) =
     let start = (Sys.time ()) in (* for performances recording purpose *)
-    let table = Array.make max_int 0 in
+    let table = Array.make 4096 0 in
     let ptr = ref 0 in
     let rec eval instructs =
         match instructs with

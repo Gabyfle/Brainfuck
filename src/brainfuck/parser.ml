@@ -65,7 +65,7 @@ let char_to_type (c: char) =
         | '-' -> DByte
         | '.' -> Out
         | ',' -> In
-        | _ -> raise (Invalid_argument "invalid instruction")
+        | k -> Printf.printf "%c" k; raise (Invalid_argument "invalid instruction")
 
 (*
     function clear_code
@@ -86,18 +86,22 @@ let clear_code (code: string) =
     string -> instructions list
 *)
 let parse (code: string) =
-    let estring = (Util.explode code) in (* exploded string *)
+    let estring = ['+';'+';'+';'+';'+';'+';'+';'+';'[';'>';'+';'+';'+';'+';'[';'>';'+';'+';'>';'+';'+';'+';'>';'+';'+';'+';'>';'+';'<';'<';'<';'<';'-';']';'>';'+';'>';'-';'>';'+';'>';'>';'+';'[';'<';']';'<';'-';']';'>';'>';'.';'>';'>';'-';'-';'-';'.';'+';'+';'+';'+';'+';'+';'+';'.';'.';'+';'+';'+';'.';'>';'.';'<';'<';'-';'.';'>';'.';'+';'+';'+';'.';'-';'-';'-';'-';'-';'-';'.';'-';'-';'-';'-';'-';'-';'-';'-';'.';'>';'+';'.';'>';'+';'+';'.'] in(*(Util.explode code) in ( exploded string *)
     let rec parser (cl: char list) (program: instructions list) =
         match cl with
             | [] -> program
             | s :: r -> begin
                 match s with
-                    | c when c = '[' -> 
+                    | c when c = '[' ->
+                        Printf.printf "\nSTARTING LOOP\n";
                         let loop = (parser r []) in
-                        let ncl = Util.trimi r (List.length loop) in
+                        let ncl = Util.trimi r ((Util.list_length loop) + 1) in
+                        Printf.printf "Length r: %d \n" (Util.list_length r);
+                        Printf.printf "Length ncl: %d" (Util.list_length ncl);
+                        Printf.printf "\nENDING LOOP\n\n";
                         parser ncl (program @ loop)
                     | c when c = ']' -> program
-                    | _ -> parser r program
+                    | _ -> Printf.printf "%c\n" (s); parser r (program @ [(char_to_type s)])
             end
     in
     parser estring []
