@@ -7,6 +7,13 @@ A Brainfuck interpreter and compiler, written in **OCaml**
 ## What is this ?
 <p style="text-align: justify;">This repository contains an interpreter written entirely in OCaml as well as a compiler. The ultimate goal would be to be able to integrate the interpreter into other projects so that he can use Brainfuck as he sees fit.</p>
 
+## How to use it ?
+<p style="text-align: justify;">To use it, just run it throught your shell by passing the Brainfuck code in argument. Example :
+```shell
+brainfuck.exe helloworld.bf
+```
+</p>
+
 ## License
 All code in this repository is under the Apache 2.0 license, available at the following address: https://www.apache.org/licenses/LICENSE-2.0
 

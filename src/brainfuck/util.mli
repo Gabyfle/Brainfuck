@@ -24,5 +24,3 @@ val sconcat : string list -> string
 val trimi : 'a list -> int -> 'a list
 val findi_from : 'a list -> int -> 'a -> int
 val explode : string -> char list
-val is_list : 'a -> bool
-val lst_length : 'a list -> int

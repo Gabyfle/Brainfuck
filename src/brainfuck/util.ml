@@ -86,23 +86,3 @@ let explode string =
         else xpld (i - 1) (string.[i] :: list)
     in
     xpld ((String.length string) - 1) []
-
-(*
-    function is_list
-    Returns wether or not the given argument is a list
-    'a -> bool
-*)
-let is_list l = match l with 
-    | s :: r -> true
-    | _ -> false
-
-(*
-    function lst_length
-    Returns the length of a list plus the length of the sub-lists
-    'a list -> int
-*)
-let rec lst_length (lst: 'a list) =
-    match lst with
-        | [] -> 0
-        | s :: r -> 1 + lst_length r
-        | s :: r when (is_list s) -> 1 + lst_length s + lst_length r
