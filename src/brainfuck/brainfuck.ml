@@ -22,7 +22,7 @@ open Util
 open Parser
 
 let file_path = Sys.argv.(0) (* 1st argument in the command line have to be the filepath *)
-let code = ref "++++++++[>++++[>++>+++>+++>+<<<<-]>+>->+>>+[<]<-]>>.>>---.+++++++..+++.>.<<-.>.+++.------.--------.>+.>++."
+let code = "+++++++++[>++++++++<-]>.---.<+++[>++<-]>+..+++.<+++++++[>------<-]>-----.<+++++[>+++++++++++<-]>.--------.+++.------.<++[>----<-]>."
 
 (*
     function execute
@@ -36,24 +36,23 @@ let execute (instructs: instructions list) =
     let rec eval instructs =
         match instructs with
             | [] -> ()
-            | s :: r -> begin
-                match s with
-                    | IPointer -> incr ptr; eval r
-                    | DPointer -> decr ptr; eval r
-                    | IByte -> table.(!ptr) <- succ table.(!ptr); eval r
-                    | DByte -> table.(!ptr) <- pred table.(!ptr); eval r
-                    | Out -> Printf.printf "%c" (char_of_int table.(!ptr)); eval r
-                    | In -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x); eval r
-                    | Loop(l) -> 
-                        while table.(!ptr) <> 0 do
-                            eval l
-                        done
+            | IPointer :: r -> incr ptr; eval r
+            | DPointer :: r -> decr ptr; eval r
+            | IByte :: r -> table.(!ptr) <- succ table.(!ptr); eval r
+            | DByte :: r -> table.(!ptr) <- pred table.(!ptr); eval r
+            | Out :: r -> Printf.printf "%c " (Char.chr table.(!ptr)); eval r
+            | In :: r -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x); eval r
+            | Loop(l) :: r -> begin
+                while table.(!ptr) <> 0 do             
+                    eval l
+                done;
+                eval r
             end
     in
     eval instructs;
     Sys.time () -. start
 
 let () =
-    if (Sys.file_exists file_path) then code := sconcat (get_code file_path);
-    let program = parse !code in
+    (*if (Sys.file_exists file_path) then code := sconcat (get_code file_path);*)
+    let program = parse code in
     Printf.printf "Executed in : %f seconds" (execute program)

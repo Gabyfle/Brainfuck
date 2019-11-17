@@ -86,7 +86,7 @@ let clear_code (code: string) =
     string -> instructions list
 *)
 let parse (code: string) =
-    let estring = ['+';'+';'+';'+';'+';'+';'+';'+';'[';'>';'+';'+';'+';'+';'[';'>';'+';'+';'>';'+';'+';'+';'>';'+';'+';'+';'>';'+';'<';'<';'<';'<';'-';']';'>';'+';'>';'-';'>';'+';'>';'>';'+';'[';'<';']';'<';'-';']';'>';'>';'.';'>';'>';'-';'-';'-';'.';'+';'+';'+';'+';'+';'+';'+';'.';'.';'+';'+';'+';'.';'>';'.';'<';'<';'-';'.';'>';'.';'+';'+';'+';'.';'-';'-';'-';'-';'-';'-';'.';'-';'-';'-';'-';'-';'-';'-';'-';'.';'>';'+';'.';'>';'+';'+';'.'] in(*(Util.explode code) in ( exploded string *)
+    let estring = Util.explode (clear_code code) in (* exploded string *)
     let rec real_length (lst: instructions list) =
         match lst with
             | [] -> 0
@@ -101,8 +101,7 @@ let parse (code: string) =
                     | c when c = '[' ->
                         let loop = (parser r []) in
                         let ncl = Util.trimi r (real_length loop + 1) in
-                        Printf.printf "LOOP : %d" ((real_length [loop]));
-                        parser ncl (program @ loop)
+                        parser ncl (program @ [Loop(loop)])
                     | c when c = ']' -> program
                     | c -> parser r (program @ [(char_to_type c)])
             end
