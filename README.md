@@ -9,7 +9,9 @@ A Brainfuck interpreter and compiler, written in **OCaml**
 
 ## Performances
 - [hello.bf](https://gist.github.com/minikomi/3998533) : less than a second
-- [mandelbrot.bf](https://github.com/frerich/brainfuck/blob/master/samples/mandelbrot.bf) : 527.49 seconds
+- [mandelbrot.bf](https://github.com/frerich/brainfuck/blob/master/samples/mandelbrot.bf) : 527.4900 seconds
+- [squares.bf](https://github.com/frerich/brainfuck/blob/master/samples/squares.b) : 0.108000 seconds
+- [golden_ratio.bf](https://github.com/fabianishere/brainfuck/blob/master/examples/math/golden-ratio.bf) : 4.334000 seconds
 
 ## License
 All code in this repository is under the Apache 2.0 license, available at the following address: https://www.apache.org/licenses/LICENSE-2.0
