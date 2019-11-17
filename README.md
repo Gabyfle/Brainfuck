@@ -8,8 +8,8 @@ A Brainfuck interpreter and compiler, written in **OCaml**
 <p style="text-align: justify;">This repository contains an interpreter written entirely in OCaml as well as a compiler. The ultimate goal would be to be able to integrate the interpreter into other projects so that he can use Brainfuck as he sees fit.</p>
 
 ## Performances
-- (hello.bf)[https://gist.github.com/minikomi/3998533] : less than a second
-- (mandelbrot.bf)[https://github.com/frerich/brainfuck/blob/master/samples/mandelbrot.bf] 527.49 seconds
+- [hello.bf](https://gist.github.com/minikomi/3998533) : less than a second
+- [mandelbrot.bf](https://github.com/frerich/brainfuck/blob/master/samples/mandelbrot.bf) : 527.49 seconds
 
 ## License
 All code in this repository is under the Apache 2.0 license, available at the following address: https://www.apache.org/licenses/LICENSE-2.0
