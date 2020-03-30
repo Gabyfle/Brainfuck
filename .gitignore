@@ -1,4 +1,11 @@
 src/node_modules
 node_modules/
+     *.cmi
+     *.cmo
 *.cmi
 *.cmo
+*.exe
+.idea/Brainfuck.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml

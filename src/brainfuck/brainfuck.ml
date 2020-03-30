@@ -22,37 +22,44 @@ open Util
 open Parser
 
 let file_path = Sys.argv.(0) (* 1st argument in the command line have to be the filepath *)
-let code = "+++++++++[>++++++++<-]>.---.<+++[>++<-]>+..+++.<+++++++[>------<-]>-----.<+++++[>+++++++++++<-]>.--------.+++.------.<++[>----<-]>."
+let code = ref ""
 
 (*
     function execute
     Execute the Brainfuck code from an already parsed string and returns the time it tooks
-    instructions list -> int
+    string -> float
 *)
-let execute (instructs: instructions list) =
+let execute (code: string) =
     let start = (Sys.time ()) in (* for performances recording purpose *)
     let table = Array.make 4096 0 in
     let ptr = ref 0 in
-    let rec eval instructs =
-        match instructs with
-            | [] -> ()
-            | IPointer :: r -> incr ptr; eval r
-            | DPointer :: r -> decr ptr; eval r
-            | IByte :: r -> table.(!ptr) <- succ table.(!ptr); eval r
-            | DByte :: r -> table.(!ptr) <- pred table.(!ptr); eval r
-            | Out :: r -> Printf.printf "%c " (Char.chr table.(!ptr)); eval r
-            | In :: r -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x); eval r
-            | Loop(l) :: r -> begin
-                while table.(!ptr) <> 0 do             
-                    eval l
-                done;
-                eval r
-            end
+    let rec eval (pos: int) =
+        if pos > (String.length code) - 1 then
+            pos
+        else
+            match code.[pos] with
+                | '>' -> incr ptr; eval (pos + 1)
+                | '<' -> decr ptr; eval (pos + 1)
+                | '+' -> table.(!ptr) <- succ table.(!ptr); eval (pos + 1)
+                | '-' -> table.(!ptr) <- pred table.(!ptr); eval (pos + 1)
+                | '.' -> Printf.printf "%c " (Char.chr table.(!ptr)); eval (pos + 1)
+                | ',' -> table.(!ptr) <- Scanf.scanf " %d" (fun x -> x); eval (pos + 1)
+                | '[' -> begin
+                    let npos = ref pos in
+                    while table.(!ptr) <> 0 do
+                        npos := eval (pos + 1)
+                    done;
+                    eval (!npos + 1)
+                end
+                | ']' -> pos
+                | _ -> pos
     in
-    eval instructs;
+    ignore (eval 0);
     Sys.time () -. start
 
 let () =
-    (*if (Sys.file_exists file_path) then code := sconcat (get_code file_path);*)
-    let program = parse code in
-    Printf.printf "Executed in : %f seconds" (execute program)
+    if (Sys.file_exists file_path) then
+        code := sconcat (get_code file_path); (* Given argument is a filepath, then open-it *)
+    else
+        code := file_path; (* Given argument is brainfuck code, then execute-it *)
+    Printf.printf "Executed in : %f seconds" (execute !code)
