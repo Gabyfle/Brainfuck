@@ -1,6 +1,6 @@
 (* 
-    Util functions
-    util.mli
+    Brainfuck analysis
+    analysis.mli
 
 
     Copyright 2019 Gabriel Santamaria
@@ -18,9 +18,6 @@
     limitations under the License.
 *)
 
-(* Util functions module *)
-val get_code : string -> string list
-val sconcat : string list -> string
-val trimi : 'a list -> int -> 'a list
-val findi_from : 'a list -> int -> 'a -> int
-val explode : string -> char list
+(* Analysis functions *)
+val sementic : instructions list -> instructions list
+val optimizer : instructions list -> instructions list

@@ -27,6 +27,8 @@ type instructions =
     | DByte                       (* Decrementing pointer the byte at the pointer *)
     | Out                         (* Printing the byte at the pointer *)
     | In                          (* Get one byte at the pointer *)
+    | LStart                      (* Starting point of the loop *)
+    | LEnd                        (* Ending point of the loop *)
     | Loop of instructions list   (* A loop *)
 (* List of Brainfuck instructions, everything else is ignored *)
 let intrc = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
@@ -46,6 +48,8 @@ let rec type_to_str (instr: instructions list) =
             | DByte    -> str := !str ^ "-"
             | Out      -> str := !str ^ "."
             | In       -> str := !str ^ ","
+            | LStart   -> str := !str ^ "["
+            | LEnd   -> str := !str ^ "]"
             | Loop(l)  -> str := !str ^ ("[" ^ (type_to_str l) ^ "]")
     in
     match instr with
@@ -65,6 +69,8 @@ let char_to_type (c: char) =
         | '-' -> DByte
         | '.' -> Out
         | ',' -> In
+        | '[' -> LStart
+        | ']' -> LEnd
         | k -> Printf.printf "%c" k; raise (Invalid_argument "invalid instruction")
 
 (*
@@ -101,8 +107,8 @@ let parse (code: string) =
                     | c when c = '[' ->
                         let loop = (parser r []) in
                         let ncl = Util.trimi r (real_length loop + 1) in
-                        parser ncl (program @ [Loop(loop)])
-                    | c when c = ']' -> program
+                        parser ncl (program @ [Loop([(char_to_type c)] @ loop)])
+                    | c when c = ']' -> program @ [(char_to_type c)] (* if this is not present, it'll be reported at the analysis *)
                     | c -> parser r (program @ [(char_to_type c)])
             end
     in

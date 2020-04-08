@@ -21,19 +21,18 @@
 open Util
 open Parser
 
-open Util
-open Parser
-
 let file_path = Sys.argv.(0) (* 1st argument in the command line have to be the filepath *)
-let compiler_path = Sys.argv(1) (* 2nd argument in the command line have to be the compiler *)
 
 (*
     function compile
-    Convert Brainfuck code into C code and then compile it using the given compiler
+    Convert Brainfuck code into assembly x86 code and then compile it using a given compiler
     string -> float
 *)
 let compile(code: string) =
     let start = (Sys.time ()) in (* for performances recording purpose *)
+    let parsed = parser code (* code is already tokenized, so parse it *)
+
+
 
 
 let () =
@@ -41,6 +40,3 @@ let () =
         code := sconcat (get_code file_path); (* parse the brainfuck code *)
     else
         raise Error "This file doesn't exists."
-
-    if (!(Sys.file_exists )) then
-        raise Error "Can't find the given compiler."

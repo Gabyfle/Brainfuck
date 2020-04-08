@@ -1,6 +1,6 @@
 (* 
-    Util functions
-    util.mli
+    Brainfuck analysis
+    analysis.ml
 
 
     Copyright 2019 Gabriel Santamaria
@@ -18,9 +18,19 @@
     limitations under the License.
 *)
 
-(* Util functions module *)
-val get_code : string -> string list
-val sconcat : string list -> string
-val trimi : 'a list -> int -> 'a list
-val findi_from : 'a list -> int -> 'a -> int
-val explode : string -> char list
+(*
+    Sementic analyser
+    Find broken / unvalid code and report it
+
+    Basically, it'll be looking for problems in loops
+*)
+let sementic (parsed: instructions list) =
+    
+
+
+(*
+    Code optimizer
+    Attempt to optimize brainfuck code before translating it into asmx86
+*)
+let optimize (parsed: instructions list) =
+    (* TODO *)
