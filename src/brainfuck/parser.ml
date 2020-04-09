@@ -18,98 +18,53 @@
     limitations under the License.
 *)
 
-(* Parser module *)
-(* Enumeration of Brainfuck instructions, everything else is ignored *)
-type instructions =
-    | IPointer                    (* Incrementing pointer *)
-    | DPointer                    (* Decrementing pointer *)
-    | IByte                       (* Incrementing pointer the byte at the pointer *)
-    | DByte                       (* Decrementing pointer the byte at the pointer *)
-    | Out                         (* Printing the byte at the pointer *)
-    | In                          (* Get one byte at the pointer *)
-    | LStart                      (* Starting point of the loop *)
-    | LEnd                        (* Ending point of the loop *)
-    | Loop of instructions list   (* A loop *)
-(* List of Brainfuck instructions, everything else is ignored *)
-let intrc = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
+open Util
+open Tokenizer
+
+exception Syntax_Error of string
 
 (*
-    function type_to_str
-    transform a type list into a char instruction
-    instructions list -> string
+    Parser
+    Find broken / unvalid code and report it
+
+    Basically, it'll be looking for problems in loops
 *)
-let rec type_to_str (instr: instructions list) = 
-    let str = ref "" in
-    let rec parse (instr: instructions) =
-        match instr with
-            | IPointer -> str := !str ^ ">"
-            | DPointer -> str := !str ^ "<"
-            | IByte    -> str := !str ^ "+"
-            | DByte    -> str := !str ^ "-"
-            | Out      -> str := !str ^ "."
-            | In       -> str := !str ^ ","
-            | LStart   -> str := !str ^ "["
-            | LEnd   -> str := !str ^ "]"
-            | Loop(l)  -> str := !str ^ ("[" ^ (type_to_str l) ^ "]")
+let parse (code: instruction list) =    
+    let char_count = ref 1 in
+    let loop_count = ref 0 in
+
+    let rec validate_loop (loop: instruction list) =
+        match loop with
+            | LEnd :: [] -> true
+            | x :: [] -> false
+            | [] -> false
+            | s :: r -> validate_loop r            
     in
-    match instr with
-        | [] -> !str
-        | s :: r -> (parse s); type_to_str (r)
-
-(*
-    function char_to_type
-    transform a brainfuck char into a type
-    char -> instructions
-*)
-let char_to_type (c: char) =
-    match c with
-        | '>' -> IPointer
-        | '<' -> DPointer
-        | '+' -> IByte
-        | '-' -> DByte
-        | '.' -> Out
-        | ',' -> In
-        | '[' -> LStart
-        | ']' -> LEnd
-        | k -> Printf.printf "%c" k; raise (Invalid_argument "invalid instruction")
-
-(*
-    function clear_code
-    clear code from every comments
-    string -> string
-*)
-let clear_code (code: string) =
-    let str = ref "" in
-    let is_instruction element =
-        if List.mem element intrc then str := !str ^ (Char.escaped element)
-    in
-    String.iter is_instruction code;
-    !str
-
-(*
-    function parse
-    convert a brainfuck string into a list of instructions
-    string -> instructions list
-*)
-let parse (code: string) =
-    let estring = Util.explode (clear_code code) in (* exploded string *)
-    let rec real_length (lst: instructions list) =
-        match lst with
-            | [] -> 0
-            | Loop(l) :: r -> 2 + ((real_length l) + (real_length r))
-            | _ :: r -> 1 + real_length r
-    in
-    let rec parser (cl: char list) (program: instructions list) =
-        match cl with
-            | [] -> program
-            | s :: r -> begin
-                match s with
-                    | c when c = '[' ->
-                        let loop = (parser r []) in
-                        let ncl = Util.trimi r (real_length loop + 1) in
-                        parser ncl (program @ [Loop([(char_to_type c)] @ loop)])
-                    | c when c = ']' -> program @ [(char_to_type c)] (* if this is not present, it'll be reported at the analysis *)
-                    | c -> parser r (program @ [(char_to_type c)])
+    let rec parser (parsed: instruction list) (in_loop: bool) =
+        match parsed with
+            | Loop(s) :: r -> begin
+                Pervasives.incr loop_count;
+                if (not (validate_loop s)) then
+                    raise (Syntax_Error ("No matching ']' found for '[' at char " ^ (Pervasives.string_of_int !char_count) ^ " in loop " ^ (Pervasives.string_of_int !loop_count)))
+                else
+                    parser s true; (* parse what's inside the loop and then continue parsing *)
+                    parser r false
             end
+            | LEnd :: r -> begin
+                match r with
+                    | h :: t -> raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Pervasives.string_of_int !char_count)))
+                    | [] -> begin
+                        if (not in_loop) then
+                            raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Pervasives.string_of_int !char_count)))
+                        else
+                            Pervasives.incr char_count
+                    end
+            end
+            | s :: r -> begin
+                Pervasives.incr char_count;
+                parser r in_loop
+            end
+            | [] -> ()
     in
-    parser estring []
+    ignore (parser code false);
+    code

@@ -10,6 +10,29 @@ A Brainfuck compiler, written in **OCaml**
 ## Performances
 **Not yet tested**
 
+## Parser feature
+This compiler includes a very simple parser that will detect broken *Brainfuck* code. Here is some examples of how does it tell you that you made a mistake :
+
+* **Example 1 :** you forgot to close a loop
+Input :
+```brainfuck
+++++++++++[>+++++++
+```
+Output :
+```
+Parser.Syntax_Error("No matching ']' found for '[' at char 11 in loop 1")
+```
+
+* **Example 2 :** you added a `]` that does not match any loop
+Input :
+```brainfuck
+++++++++++>+++++++]
+```
+Output :
+```
+Parser.Syntax_Error("No matching '[' found for ']' at char 19")
+```
+
 ## License
 All code in this repository is under the Apache 2.0 license, available at the following address: https://www.apache.org/licenses/LICENSE-2.0
 

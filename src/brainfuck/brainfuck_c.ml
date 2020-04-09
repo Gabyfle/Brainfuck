@@ -19,6 +19,7 @@
 *)
 
 open Util
+open Tokenizer
 open Parser
 
 let file_path = Sys.argv.(0) (* 1st argument in the command line have to be the filepath *)
@@ -30,13 +31,16 @@ let file_path = Sys.argv.(0) (* 1st argument in the command line have to be the 
 *)
 let compile(code: string) =
     let start = (Sys.time ()) in (* for performances recording purpose *)
-    let parsed = parser code (* code is already tokenized, so parse it *)
-
+    (* Here's the different steps according to https://en.wikipedia.org/wiki/Compiler *)
+    let tokenized = tokenize code in (* tokenize the code *)
+    try
+        let parsed = parse tokenized in (* now let's parse it *)
+        ()
+    with e ->
+        let msg = Printexc.to_string e in
+        Printf.printf "%s" msg (* Display possible error to the user *)
 
 
 
 let () =
-    if (Sys.file_exists file_path) then
-        code := sconcat (get_code file_path); (* parse the brainfuck code *)
-    else
-        raise Error "This file doesn't exists."
+    compile "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>."
