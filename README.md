@@ -35,6 +35,10 @@ Parser.Syntax_Error("No matching ']' found for '[' at char 11 in loop 1")
 Parser.Syntax_Error("No matching '[' found for ']' at char 19")
 ```
 
+## Optimization goal
+* Optimize loops
+* Optimize dead code
+
 ## License
 All code in this repository is under the Apache 2.0 license, available at the following address: https://www.apache.org/licenses/LICENSE-2.0
 
