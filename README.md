@@ -14,21 +14,23 @@ A Brainfuck compiler, written in **OCaml**
 This compiler includes a very simple parser that will detect broken *Brainfuck* code. Here is some examples of how does it tell you that you made a mistake :
 
 * **Example 1 :** you forgot to close a loop
-Input :
+
+*Input :*
 ```brainfuck
 ++++++++++[>+++++++
 ```
-Output :
+*Output :*
 ```
 Parser.Syntax_Error("No matching ']' found for '[' at char 11 in loop 1")
 ```
 
 * **Example 2 :** you added a `]` that does not match any loop
-Input :
+
+*Input :*
 ```brainfuck
 ++++++++++>+++++++]
 ```
-Output :
+*Output :*
 ```
 Parser.Syntax_Error("No matching '[' found for ']' at char 19")
 ```
