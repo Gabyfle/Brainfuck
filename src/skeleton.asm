@@ -25,7 +25,7 @@ section .text
         ; {{here comes the brainfuck program}}
 
         mov eax, SYS_EXIT ; sys_exit
-        int 0x80
+        syscall
 
     ; Indicates that program ended with error
     exit_error:
