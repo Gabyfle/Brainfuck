@@ -8,8 +8,11 @@ global _start
 ; exit program
 %define SYS_EXIT  1
 
+; define the syscall keyword
+%define syscall int 0x80
+
 section .data
-    ptr dd 0 ; this will be used to point to adresses in stack 
+    pointer dw 0 ; this will be used to point to adresses in stack 
 
 section .text
     _start:
@@ -19,59 +22,74 @@ section .text
         xor ecx, ecx
         xor edx, edx
 
-        ; here comes the brainfuck program
+        ; {{here comes the brainfuck program}}
 
         mov eax, SYS_EXIT ; sys_exit
-        syscall
-
-    ; Prints the pointed character to STDOUT
-    print:
-        mov eax, SYS_WRITE ; sys_write
-        mov ebx, 1 ; stdout
-        mov edx, 1 ; just a character
-        lea ecx, [esp + ptr] ; print value from adress ESP + PTR
-        syscall
-
-        ret
-    
-    ; Reads a character from STDIN and puts it in the pointed cell
-    read: ; reads a character from stdin
-        mov eax, SYS_READ ; sys_read
-        mov ebx, 0 ; stdin
-        mov edx, 1 ; just one character
-        lea ecx, [esp + ptr] ; put the result in at the adress ESP + PTR
-        syscall
-
-        ret
-
-    ; Points to the next memory cell
-    next:
-        add [ptr], 1 ; we add one to our memory address indicator
-
-        ret
-    
-    ; Points to the previous memory cell
-    prev:
-        cmp [ptr], 0 ; check if the value contained at the address of ptr is equal to 0
-        je exit_error ; if yes then jump to exit_error
-        sub [ptr], 1 ; substract one to our memory adress indicator
-
-        ret
-
-    ; Increment the current cell's value
-    incr:
-        add [esp + ptr], 1 ; we add one to the value pointed by EBP + ptr
-
-        ret
-
-    ; Decrement the current cell's value
-    decr:
-        sub [esp + ptr], 1 ; we substract one the the value pointer by EBP + ptr
-
-        ret
+        int 0x80
 
     ; Indicates that program ended with error
     exit_error:
         mov eax, SYS_EXIT
         mov ebx, 1
         syscall
+
+    ;'''''''''''''''';
+    ;   PROCEDURES   ;
+    ;________________;
+
+    ; Prints the pointed character to STDOUT
+    print:
+        mov eax, SYS_WRITE ; sys_write
+        mov ebx, 1 ; stdout
+        call ptr_address
+        lea ecx, [edx] ; print value from adress ESP + pointer
+        mov edx, 1 ; just a character
+        syscall
+
+        ret
+
+    ; Reads a character from STDIN and puts it in the pointed cell
+    read: ; reads a character from stdin
+        mov eax, SYS_READ ; sys_read
+        mov ebx, 0 ; stdin
+        call ptr_address
+        lea ecx, [edx] ; put the result in at the adress ESP + pointer
+        mov edx, 1 ; just one character
+        syscall
+
+        ret
+
+    ; Points to the next memory cell
+    next:
+        add [pointer], dword 1 ; we add one to our memory address indicator
+
+        ret
+
+    ; Points to the previous memory cell
+    prev:
+        cmp [pointer], dword 0 ; check if the value contained at the address of pointer is equal to 0
+        je exit_error ; if yes then jump to exit_error
+        sub [pointer], dword 1 ; substract one to our memory adress indicator
+
+        ret
+
+    ; Increment the current cell's value
+    incr:
+        call ptr_address
+        add [edx], dword 1 ; we add one to the value pointed by EBP + pointer
+
+        ret
+
+    ; Decrement the current cell's value
+    decr:
+        call ptr_address
+        sub [edx], dword 1 ; we substract one the the value pointer by EBP + pointer
+
+        ret
+
+    ; Computes the pointer address into EDX
+    ptr_address:
+        mov edx, esp
+        add edx, pointer
+
+        ret
