@@ -19,8 +19,6 @@ section .text
         xor ecx, ecx
         xor edx, edx
 
-        mov ebp, esp ; save the current ESP position into EBP (it'll be the bottom of the stack)
-
         ; here comes the brainfuck program
 
         mov eax, SYS_EXIT ; sys_exit
@@ -31,7 +29,7 @@ section .text
         mov eax, SYS_WRITE ; sys_write
         mov ebx, 1 ; stdout
         mov edx, 1 ; just a character
-        mov ecx, 
+        lea ecx, [esp + ptr] ; print value from adress ESP + PTR
         syscall
 
         ret
@@ -41,6 +39,7 @@ section .text
         mov eax, SYS_READ ; sys_read
         mov ebx, 0 ; stdin
         mov edx, 1 ; just one character
+        lea ecx, [esp + ptr] ; put the result in at the adress ESP + PTR
         syscall
 
         ret
@@ -61,13 +60,13 @@ section .text
 
     ; Increment the current cell's value
     incr:
-        add [ebp + ptr], 1 ; we add one to the value pointed by EBP + ptr
+        add [esp + ptr], 1 ; we add one to the value pointed by EBP + ptr
 
         ret
 
     ; Decrement the current cell's value
     decr:
-        sub [ebp + ptr], 1 ; we substract one the the value pointer by EBP + ptr
+        sub [esp + ptr], 1 ; we substract one the the value pointer by EBP + ptr
 
         ret
 
