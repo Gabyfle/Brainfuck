@@ -90,6 +90,6 @@ section .text
     ; Computes the pointer address into EDX
     ptr_address:
         mov edx, esp
-        add edx, pointer
+        add edx, [pointer]
 
         ret
