@@ -1,6 +1,6 @@
 (* 
     Instructions to x86 traductor
-    brainfuck_c.ml
+    x86.mli
 
 
     Copyright 2019 Gabriel Santamaria
@@ -17,3 +17,15 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 *)
+
+open Tokenizer
+
+type x86 =
+    | Add of int        (* + (1) or - (-1) *)
+    | Point of int      (* > (1) or < (-1) *)
+    | Loop of x86 list  (* List of x86 instructions *)
+    | Write             (* sys_write *)
+    | Read              (* sys_read *)
+
+val instr_to_x86 : instruction list -> x86 list -> x86 list
+val merge : x86 list -> x86 list

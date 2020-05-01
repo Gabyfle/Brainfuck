@@ -49,7 +49,7 @@ let rec type_to_str (instr: instruction list) =
             | Out      -> str := !str ^ "."
             | In       -> str := !str ^ ","
             | LStart   -> str := !str ^ "["
-            | LEnd   -> str := !str ^ "]"
+            | LEnd     -> str := !str ^ "]"
             | Loop(l)  -> str := !str ^ ("[" ^ (type_to_str l) ^ "]")
     in
     match instr with
