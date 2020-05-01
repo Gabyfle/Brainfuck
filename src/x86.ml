@@ -28,15 +28,15 @@ open Tokenizer
 let rec instr_to_x86 (bf: instruction list) (instr: x86 list)  = 
     match bf with
         | []            -> instr
-        | IPointer :: r -> instr_to_x86 r (instr @ Point(1))
-        | DPointer :: r -> instr_to_x86 r (instr @ Point(-1))
-        | IByte    :: r -> instr_to_x86 r (instr @ Add(1))
-        | DByte    :: r -> instr_to_x86 r (instr @ Add(-1))
-        | Out      :: r -> instr_to_x86 r (instr @ Add(1))
-        | In       :: r -> instr_to_x86 r (instr @ Read)
+        | IPointer :: r -> instr_to_x86 r ([Point(1)] @ instr)
+        | DPointer :: r -> instr_to_x86 r ([Point(-1)] @ instr)
+        | IByte    :: r -> instr_to_x86 r ([Add(1)] @ instr)
+        | DByte    :: r -> instr_to_x86 r ([Add(-1)] @ instr)
+        | Out      :: r -> instr_to_x86 r ([Write] @ instr)
+        | In       :: r -> instr_to_x86 r ([Read] @ instr)
         | Loop(s)  :: r -> begin
             let loop = (instr_to_x86 s []) in
-            instr_to_x86 r (instr @ x86.Loop(loop))
+            instr_to_x86 r (x86.Loop(loop) @ instr)
         end
         | _ :: r -> instr_to_x86 r instr
 
@@ -45,5 +45,33 @@ let rec instr_to_x86 (bf: instruction list) (instr: x86 list)  =
     merges similar expressions that follow one another into a single
     x86 list -> x86 list
 *)
-let rec merge (instr: x86 list) =
-    () (* TODO *)
+let rec merge (instr: x86 list) (merged: x86 list) =
+    match instr with
+        | [] -> merged
+        | Point(v) :: r -> begin
+            match merged with
+                | Point(w) :: t -> merge r (Point(v + w) @ merged)
+                | _ -> merge r ([Point(v)] @ merged)
+        end
+        | Add(v)   :: r -> begin
+            match merged with
+                | Add(w) :: t -> merge r ([Add(v + w)] @ merged)
+                | _ -> merge r ([Add(v)] @ merged)
+        end
+        | Loop(l)  :: r -> merge r ((merge l []) @ merged)
+
+(*
+    function x86_to_str
+    translate x86 type elements to actual x86 code
+    x86 -> str
+
+let rec x86_to_str (instr: x86) =
+    match instr with
+        | Point(v) -> begin
+            
+        end
+        | Add(v) -> begin
+
+        end
+    TODO: read from files in /assembly/
+*)
