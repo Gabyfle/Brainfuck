@@ -20,7 +20,10 @@
 
 open Tokenizer
 
-(*
+open Pervasives
+open Str
+
+(**
     function instr_to_x86
     translates an instruction into a x86 type
     instruction list -> x86 list
@@ -40,7 +43,7 @@ let rec instr_to_x86 (bf: instruction list) (instr: x86 list)  =
         end
         | _ :: r -> instr_to_x86 r instr
 
-(*
+(**
     function merge
     merges similar expressions that follow one another into a single
     x86 list -> x86 list
@@ -60,18 +63,25 @@ let rec merge (instr: x86 list) (merged: x86 list) =
         end
         | Loop(l)  :: r -> merge r ((merge l []) @ merged)
 
-(*
+(**
     function x86_to_str
     translate x86 type elements to actual x86 code
     x86 -> str
-
-let rec x86_to_str (instr: x86) =
-    match instr with
+*)
+let rec x86_to_str (instr: x86) = function
         | Point(v) -> begin
-            
+            if v == 0 then ""
+            if v > 0 then
+                let file = Pervasives.open_in "assembly/next.asm" in
+                let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
+                let pattern = Str.regexp "({{amount}})" in
+                Str.global_replace pattern v code
+            if v < 0 then
+                let file = Pervasives.open_in "assembly/prev.asm" in
+                let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
+                let pattern = Str.regexp "({{amount}})" in
+                Str.global_replace pattern v code
         end
         | Add(v) -> begin
 
         end
-    TODO: read from files in /assembly/
-*)
