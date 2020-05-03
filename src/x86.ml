@@ -1,4 +1,4 @@
-(* 
+(*
     Instructions to x86 traductor
     x86.ml
 
@@ -23,7 +23,7 @@ open Tokenizer
 open Pervasives
 open Str
 
-(**
+(*
     function instr_to_x86
     translates an instruction into a x86 type
     instruction list -> x86 list
@@ -43,7 +43,7 @@ let rec instr_to_x86 (bf: instruction list) (instr: x86 list)  =
         end
         | _ :: r -> instr_to_x86 r instr
 
-(**
+(*
     function merge
     merges similar expressions that follow one another into a single
     x86 list -> x86 list
@@ -63,25 +63,44 @@ let rec merge (instr: x86 list) (merged: x86 list) =
         end
         | Loop(l)  :: r -> merge r ((merge l []) @ merged)
 
-(**
+(*
     function x86_to_str
     translate x86 type elements to actual x86 code
     x86 -> str
+
+    ! THIS FUNCTION HASN'T BEEN TESTED YET !
 *)
-let rec x86_to_str (instr: x86) = function
-        | Point(v) -> begin
+let x86_to_str (instr: x86 list) = 
+    (* replace a certain pattern by a value using regex *)
+    let read_replace (file: str) (pattern: str) replace =
+        let file = Pervasives.open_in file in
+        let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
+        let reg = Str.regexp pattern in
+        Str.global_replace pattern replace code
+    in
+    (* converts x86 assembly object type into real assembly code *)
+    let rec convert (assembly: x86 list) (code: str) = function
+        | Point(v) :: r -> begin
             if v == 0 then ""
             if v > 0 then
-                let file = Pervasives.open_in "assembly/next.asm" in
-                let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
-                let pattern = Str.regexp "({{amount}})" in
-                Str.global_replace pattern v code
-            if v < 0 then
-                let file = Pervasives.open_in "assembly/prev.asm" in
-                let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
-                let pattern = Str.regexp "({{amount}})" in
-                Str.global_replace pattern v code
+                convert code ^ (read_replace "assembly/next.asm" "({{amount}})" v)
+            else
+                convert code ^ (read_replace "assembly/prev.asm" "({{amount}})" v)
         end
-        | Add(v) -> begin
+        | Add(v) :: r -> begin
+            if v == 0 then ""
+            if v > 0 then
+                convert r code ^ (read_replace "assembly/incr.asm" "({{amount}})" v)
+            else
+                convert r code ^ (read_replace "assembly/decr.asm" "({{amount}})" v)
+        end
+        | Loop(l) :: r -> begin
+            let content = convert l in
+            let partial = read_replace "assembly/loop.asm" "{{loop_body}}" content in
+            let regex = Str.regexp "{{loop_number}}" in
+            let final = Str.global_replace regex Unix.time partial in
 
+            convert r code ^ final
         end
+    in
+    convert instr
