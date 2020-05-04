@@ -24,15 +24,14 @@ open Parser
 
 open X86
 
-let file_path = Sys.argv.(0) in (* 1st argument in the command line have to be the filepath *)
-let file_name = Sys.argv.(1) in
-
 (*
     function compile
     Convert Brainfuck code into assembly x86 code and then compile it using a given compiler
     string -> float
 *)
 let compile(code: string) =
+    let file_path = Sys.argv.(0) in (* 1st argument in the command line have to be the filepath *)
+    let file_name = Sys.argv.(1) in
     let start = (Sys.time ()) in (* for performances recording purpose *)
     (* Here's the different steps according to https://en.wikipedia.org/wiki/Compiler *)
     let tokenized = tokenize code in (* tokenize the code *)
