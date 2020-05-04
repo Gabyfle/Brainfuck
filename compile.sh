@@ -19,8 +19,11 @@ function is_ocaml_installed ()
 function try ()
 {
     local value=$1
-    local err
-    err="$(eval $value)" 1>&1 || {
+    eval "$value" 2>"errors.log"
+
+    local err=$(< errors.log)
+
+    [ ! $? ] || {
         echo "[Compile.sh] An error occurred."
         echo "[Compile.sh] Warning, I'll give you the error very soon..."
         sleep 1
