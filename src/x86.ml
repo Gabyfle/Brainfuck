@@ -72,10 +72,11 @@ let rec merge (instr: x86 list) (merged: x86 list) =
 *)
 let x86_to_str (instr: x86 list) = 
     (* replace a certain pattern by a value using regex *)
-    let read_replace (file: str) (pattern: str) replace =
+    let read_replace (file: str) (pattern: str) (replace: str) =
         let file = Pervasives.open_in file in
         let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
         let reg = Str.regexp pattern in
+        Pervasives.close_in file;
         Str.global_replace pattern replace code
     in
     (* converts x86 assembly object type into real assembly code *)
@@ -83,16 +84,16 @@ let x86_to_str (instr: x86 list) =
         | Point(v) :: r -> begin
             if v == 0 then ""
             if v > 0 then
-                convert code ^ (read_replace "assembly/next.asm" "({{amount}})" v)
+                convert code ^ (read_replace "assembly/next.asm" "({{amount}})" (string_of_int v))
             else
-                convert code ^ (read_replace "assembly/prev.asm" "({{amount}})" v)
+                convert code ^ (read_replace "assembly/prev.asm" "({{amount}})" (string_of_int v))
         end
         | Add(v) :: r -> begin
             if v == 0 then ""
             if v > 0 then
-                convert r code ^ (read_replace "assembly/incr.asm" "({{amount}})" v)
+                convert r code ^ (read_replace "assembly/incr.asm" "({{amount}})" (string_of_int v))
             else
-                convert r code ^ (read_replace "assembly/decr.asm" "({{amount}})" v)
+                convert r code ^ (read_replace "assembly/decr.asm" "({{amount}})" (string_of_int v))
         end
         | Loop(l) :: r -> begin
             let content = convert l in

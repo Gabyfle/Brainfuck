@@ -25,7 +25,7 @@ section .text
         mov edx, esp
         add edx, [pointer]
 
-        ; program goes here
+        {{code}}
 
         mov eax, SYS_EXIT
         mov ebx, 0

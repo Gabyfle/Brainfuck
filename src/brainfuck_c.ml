@@ -22,7 +22,10 @@ open Util
 open Tokenizer
 open Parser
 
-let file_path = Sys.argv.(0) (* 1st argument in the command line have to be the filepath *)
+open X86
+
+let file_path = Sys.argv.(0) in (* 1st argument in the command line have to be the filepath *)
+let file_name = Sys.argv.(1) in
 
 (*
     function compile
@@ -35,12 +38,23 @@ let compile(code: string) =
     let tokenized = tokenize code in (* tokenize the code *)
     try
         let parsed = parse tokenized in (* now let's parse it *)
-        ()
+        let compiled = instr_to_x86 parsed [] in (* translates it to actual x86 instruction set *)
+        let optimised = merge compiled [] in
+        let compiled_str = x86_to_str optimised in
+        let file = Pervasives.open_in file in
+        let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
+        close_in file;
+
+        let reg = Str.regexp "{{code}}" in
+        let final = Str.global_replace reg compiled_str code in
+
+        let f = Pervasives.open_out file_name in
+        Printf.fprintf f "%s\n" final;
+        Pervasives.close_out f;
+
     with e ->
         let msg = Printexc.to_string e in
         Printf.printf "%s" msg (* Display possible error to the user *)
-
-
 
 let () =
     compile "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>."
