@@ -20,26 +20,30 @@
 
 open Tokenizer
 
-open Pervasives
-open Str
+type x86 =
+    | Add of int        (* + (1) or - (-1) *)
+    | Point of int      (* > (1) or < (-1) *)
+    | Loop of x86 list  (* List of x86 instructions *)
+    | Write             (* sys_write *)
+    | Read              (* sys_read *)
 
 (*
     function instr_to_x86
     translates an instruction into a x86 type
-    instruction list -> x86 list
+    Tokenizer.instruction list -> x86 list
 *)
-let rec instr_to_x86 (bf: instruction list) (instr: x86 list)  = 
+let rec instr_to_x86 (bf: Tokenizer.instruction list) (instr: x86 list)  = 
     match bf with
         | []            -> instr
-        | IPointer :: r -> instr_to_x86 r ([Point(1)] @ instr)
-        | DPointer :: r -> instr_to_x86 r ([Point(-1)] @ instr)
-        | IByte    :: r -> instr_to_x86 r ([Add(1)] @ instr)
-        | DByte    :: r -> instr_to_x86 r ([Add(-1)] @ instr)
-        | Out      :: r -> instr_to_x86 r ([Write] @ instr)
-        | In       :: r -> instr_to_x86 r ([Read] @ instr)
-        | Loop(s)  :: r -> begin
+        | Tokenizer.IPointer :: r -> instr_to_x86 r ([Point(1)] @ instr)
+        | Tokenizer.DPointer :: r -> instr_to_x86 r ([Point(-1)] @ instr)
+        | Tokenizer.IByte    :: r -> instr_to_x86 r ([Add(1)] @ instr)
+        | Tokenizer.DByte    :: r -> instr_to_x86 r ([Add(-1)] @ instr)
+        | Tokenizer.Out      :: r -> instr_to_x86 r ([Write] @ instr)
+        | Tokenizer.In       :: r -> instr_to_x86 r ([Read] @ instr)
+        | Tokenizer.Loop(s)  :: r -> begin
             let loop = (instr_to_x86 s []) in
-            instr_to_x86 r (x86.Loop(loop) @ instr)
+            instr_to_x86 r ([Loop(loop)] @ instr)
         end
         | _ :: r -> instr_to_x86 r instr
 
@@ -53,7 +57,7 @@ let rec merge (instr: x86 list) (merged: x86 list) =
         | [] -> merged
         | Point(v) :: r -> begin
             match merged with
-                | Point(w) :: t -> merge r (Point(v + w) @ merged)
+                | Point(w) :: t -> merge r ([Point(v + w)] @ merged)
                 | _ -> merge r ([Point(v)] @ merged)
         end
         | Add(v)   :: r -> begin
@@ -62,6 +66,7 @@ let rec merge (instr: x86 list) (merged: x86 list) =
                 | _ -> merge r ([Add(v)] @ merged)
         end
         | Loop(l)  :: r -> merge r ((merge l []) @ merged)
+        | s :: r -> merge r ([s] @ merged)
 
 (*
     function x86_to_str
@@ -72,36 +77,42 @@ let rec merge (instr: x86 list) (merged: x86 list) =
 *)
 let x86_to_str (instr: x86 list) = 
     (* replace a certain pattern by a value using regex *)
-    let read_replace (file: str) (pattern: str) (replace: str) =
-        let file = Pervasives.open_in file in
-        let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
+    let read_replace (file: string) (pattern: string) (replace: string) =
+        let file = Stdlib.open_in file in
+        let code = Stdlib.really_input_string file (Stdlib.in_channel_length file) in
         let reg = Str.regexp pattern in
-        Pervasives.close_in file;
-        Str.global_replace pattern replace code
+        Stdlib.close_in file;
+        Str.global_replace reg replace code
     in
     (* converts x86 assembly object type into real assembly code *)
-    let rec convert (assembly: x86 list) (code: str) = function
-        | Point(v) :: r -> begin
-            if v == 0 then ""
-            if v > 0 then
-                convert code ^ (read_replace "assembly/next.asm" "({{amount}})" (string_of_int v))
-            else
-                convert code ^ (read_replace "assembly/prev.asm" "({{amount}})" (string_of_int v))
-        end
-        | Add(v) :: r -> begin
-            if v == 0 then ""
-            if v > 0 then
-                convert r code ^ (read_replace "assembly/incr.asm" "({{amount}})" (string_of_int v))
-            else
-                convert r code ^ (read_replace "assembly/decr.asm" "({{amount}})" (string_of_int v))
-        end
-        | Loop(l) :: r -> begin
-            let content = convert l in
-            let partial = read_replace "assembly/loop.asm" "{{loop_body}}" content in
-            let regex = Str.regexp "{{loop_number}}" in
-            let final = Str.global_replace regex Unix.time partial in
+    let rec convert (assembly: x86 list) (code: string) = 
+        match assembly with
+            | Point(v) :: r -> begin
+                if v == 0 then convert r code
+                else if v > 0 then
+                    convert r (code ^ (read_replace "assembly/next.asm" "({{amount}})" (Stdlib.string_of_int v)))
+                else
+                    convert r (code ^ (read_replace "assembly/prev.asm" "({{amount}})" (Stdlib.string_of_int v)))
+            end
+            | Add(v) :: r -> begin
+                if v == 0 then convert r code
+                else if v > 0 then
+                    convert r (code ^ (read_replace "assembly/incr.asm" "({{amount}})" (Stdlib.string_of_int v)))
+                else
+                    convert r (code ^ (read_replace "assembly/decr.asm" "({{amount}})" (Stdlib.string_of_int v)))
+            end
+            | Loop(l) :: r -> begin
+                let content = convert l "" in
+                let partial = read_replace "assembly/loop.asm" "{{loop_body}}" content in
+                let regex = Str.regexp "{{loop_number}}" in
+                let final = Str.global_replace regex (Stdlib.string_of_float (Unix.time())) partial in
 
-            convert r code ^ final
-        end
+                convert r (code ^ final)
+            end
+            | Write :: r -> convert r (code ^ "final")
+            | Read :: r -> begin
+                convert r (code ^ "final")
+            end
+            | [] -> code
     in
     convert instr

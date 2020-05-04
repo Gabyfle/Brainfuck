@@ -41,16 +41,16 @@ let compile(code: string) =
         let compiled = instr_to_x86 parsed [] in (* translates it to actual x86 instruction set *)
         let optimised = merge compiled [] in
         let compiled_str = x86_to_str optimised in
-        let file = Pervasives.open_in file in
-        let code = Pervasives.really_input_string file (Pervasives.in_channel_length file) in
-        close_in file;
+        let file = Stdlib.open_in file in
+        let code = Pervasives.really_input_string file (Stdlib.in_channel_length file) in
+        Printf.close_in file;
 
         let reg = Str.regexp "{{code}}" in
         let final = Str.global_replace reg compiled_str code in
 
-        let f = Pervasives.open_out file_name in
+        let f = Stdlib.open_out file_name in
         Printf.fprintf f "%s\n" final;
-        Pervasives.close_out f;
+        Stdlib.close_out f;
 
     with e ->
         let msg = Printexc.to_string e in

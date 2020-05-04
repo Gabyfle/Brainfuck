@@ -29,7 +29,7 @@ type instruction =
     | In                          (* Get one byte at the pointer *)
     | LStart                      (* Starting point of the loop *)
     | LEnd                        (* Ending point of the loop *)
-    | Loop of instruction list   (* A loop *)
+    | Loop of instruction list    (* A loop *)
 (* List of Brainfuck instructions, everything else is ignored *)
 let intrc = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
 

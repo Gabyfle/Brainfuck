@@ -28,4 +28,4 @@ type x86 =
     | Read              (* sys_read *)
 
 val instr_to_x86 : instruction list -> x86 list -> x86 list
-val merge : x86 list -> x86 list
+val merge : x86 list -> x86 list -> x86 list

@@ -43,25 +43,25 @@ let parse (code: instruction list) =
     let rec parser (parsed: instruction list) (in_loop: bool) =
         match parsed with
             | Loop(s) :: r -> begin
-                Pervasives.incr loop_count;
+                Stdlib.incr loop_count;
                 if (not (validate_loop s)) then
-                    raise (Syntax_Error ("No matching ']' found for '[' at char " ^ (Pervasives.string_of_int !char_count) ^ " in loop " ^ (Pervasives.string_of_int !loop_count)))
+                    raise (Syntax_Error ("No matching ']' found for '[' at char " ^ (Stdlib.string_of_int !char_count) ^ " in loop " ^ (Pervasives.string_of_int !loop_count)))
                 else
                     parser s true; (* parse what's inside the loop and then continue parsing *)
                     parser r false
             end
             | LEnd :: r -> begin
                 match r with
-                    | h :: t -> raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Pervasives.string_of_int !char_count)))
+                    | h :: t -> raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Stdlib.string_of_int !char_count)))
                     | [] -> begin
                         if (not in_loop) then
-                            raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Pervasives.string_of_int !char_count)))
+                            raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Stdlib.string_of_int !char_count)))
                         else
-                            Pervasives.incr char_count
+                            Stdlib.incr char_count
                     end
             end
             | s :: r -> begin
-                Pervasives.incr char_count;
+                Stdlib.incr char_count;
                 parser r in_loop
             end
             | [] -> ()
