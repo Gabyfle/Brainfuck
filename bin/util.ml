@@ -56,8 +56,9 @@ let sconcat (l: string list) =
 *)
 let rec trimi list n = match list, n with
     | l, 0 -> l
-    | [], n when n > 0 -> raise Not_found
-    | s :: r, n -> trimi r (n - 1)
+    | _, n when n < 0 -> raise Not_found
+    | [], _ -> raise Not_found
+    | _ :: r, n -> trimi r (n - 1)
 
 (*
     function findi_from
