@@ -32,7 +32,7 @@ type x86 =
 *)
 let rec instr_to_x86 (bf: Tokenizer.instruction list) (instr: x86 list)  = 
     match bf with
-        | []            -> instr
+        | [] -> instr
         | Tokenizer.IPointer :: r -> instr_to_x86 r ([Point(1)] @ instr)
         | Tokenizer.DPointer :: r -> instr_to_x86 r ([Point(-1)] @ instr)
         | Tokenizer.IByte    :: r -> instr_to_x86 r ([Add(1)] @ instr)
@@ -48,38 +48,36 @@ let rec instr_to_x86 (bf: Tokenizer.instruction list) (instr: x86 list)  =
 (*
     function merge
     merges similar expressions that follow one another into a single
-    x86 list -> x86 list
+    x86 list -> x86 list -> x86 list
 *)
 let rec merge (instr: x86 list) (merged: x86 list) =
     match instr with
         | [] -> merged
         | Point(v) :: r -> begin
             match merged with
-                | Point(w) :: _-> merge r ([Point(v + w)] @ merged)
-                | _ -> merge r ([Point(v)] @ merged)
+                | Point(w) :: t -> merge r ([Point(v + w)] @ t)
+                | t -> merge r ([Point(v)] @ t)
         end
         | Add(v)   :: r -> begin
             match merged with
-                | Add(w) :: _ -> merge r ([Add(v + w)] @ merged)
-                | _ -> merge r ([Add(v)] @ merged)
+                | Add(w) :: t -> merge r ([Add(v + w)] @ t)
+                | t -> merge r ([Add(v)] @ t)
         end
-        | Loop(l)  :: r -> merge r ((merge l []) @ merged)
+        | Loop(l)  :: r -> merge r ([Loop(merge l [])] @ merged)
         | s :: r -> merge r ([s] @ merged)
 
 (*
     function x86_to_str
     translate x86 type elements to actual x86 code
     x86 -> str
-
-    ! THIS FUNCTION HASN'T BEEN TESTED YET !
 *)
 let x86_to_str (instr: x86 list) = 
     (* replace a certain pattern by a value using regex *)
     let read_replace (file: string) (pattern: string) (replace: string) =
-        let file = Stdlib.open_in file in
-        let code = Stdlib.really_input_string file (Stdlib.in_channel_length file) in
+        let asm = Stdlib.open_in file in
+        let code = Stdlib.really_input_string asm (Stdlib.in_channel_length asm) in
         let reg = Str.regexp pattern in
-        Stdlib.close_in file;
+        Stdlib.close_in asm;
         Str.global_replace reg replace code
     in
     (* converts x86 assembly object type into real assembly code *)
@@ -88,28 +86,35 @@ let x86_to_str (instr: x86 list) =
             | Point(v) :: r -> begin
                 if v == 0 then convert r code
                 else if v > 0 then
-                    convert r (code ^ (read_replace "assembly/next.asm" "({{amount}})" (Stdlib.string_of_int v)))
+                    convert r (code ^ (read_replace "assembly/next.asm" "{{amount}}" (Stdlib.string_of_int v)))
                 else
-                    convert r (code ^ (read_replace "assembly/prev.asm" "({{amount}})" (Stdlib.string_of_int v)))
+                    convert r (code ^ (read_replace "assembly/prev.asm" "{{amount}}" (Stdlib.string_of_int (-v))))
             end
             | Add(v) :: r -> begin
                 if v == 0 then convert r code
                 else if v > 0 then
-                    convert r (code ^ (read_replace "assembly/incr.asm" "({{amount}})" (Stdlib.string_of_int v)))
+                    convert r (code ^ (read_replace "assembly/incr.asm" "{{amount}}" (Stdlib.string_of_int v)))
                 else
-                    convert r (code ^ (read_replace "assembly/decr.asm" "({{amount}})" (Stdlib.string_of_int v)))
+                    convert r (code ^ (read_replace "assembly/decr.asm" "{{amount}}" (Stdlib.string_of_int (-v))))
             end
             | Loop(l) :: r -> begin
                 let content = convert l "" in
                 let partial = read_replace "assembly/loop.asm" "{{loop_body}}" content in
                 let regex = Str.regexp "{{loop_number}}" in
-                let final = Str.global_replace regex (Stdlib.string_of_float (Unix.time())) partial in
-
+                let final = Str.global_replace regex (Stdlib.string_of_int (List.length r)) partial in
                 convert r (code ^ final)
             end
-            | Write :: r -> convert r (code ^ "final")
+            | Write :: r -> begin
+                let asm = Stdlib.open_in "assembly/print.asm" in
+                let full = (Stdlib.really_input_string asm (Stdlib.in_channel_length asm)) in
+                Stdlib.close_in asm;
+                convert r (code ^ "\n" ^ full)
+            end
             | Read :: r -> begin
-                convert r (code ^ "final")
+                let asm = Stdlib.open_in "assembly/scan.asm" in
+                let full = (Stdlib.really_input_string asm (Stdlib.in_channel_length asm)) in
+                Stdlib.close_in asm;
+                convert r (code ^ "\n" ^ full)
             end
             | [] -> code
     in

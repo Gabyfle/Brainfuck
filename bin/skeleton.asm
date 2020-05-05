@@ -25,19 +25,19 @@ section .text
         mov edx, esp
         add edx, [pointer]
 
-        {{code}}
+{{code}}
 
         mov eax, SYS_EXIT
         mov ebx, 0
         int 0x80
 
-    _error_OOB: ; out of bounds error
-        mov eax, SYS_WRITE
-        mov ebx, 1
-        mov ecx, out_of_bounds
-        mov edx, oob_len
-        int 0x80
+    ;_error_OOB: ; out of bounds error
+    ;    mov eax, SYS_WRITE
+    ;    mov ebx, 1
+    ;    mov ecx, out_of_bounds
+    ;    mov edx, oob_len
+    ;    int 0x80
 
-        mov eax, SYS_EXIT ; exit the program after this error
-        mov ebx, 0
-        int 0x80
+    ;    mov eax, SYS_EXIT ; exit the program after this error
+    ;    mov ebx, 0
+    ;    int 0x80
