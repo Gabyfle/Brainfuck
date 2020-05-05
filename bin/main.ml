@@ -1,6 +1,6 @@
 (* 
     Brainfuck compiler
-    brainfuck_c.ml
+    main.ml
 
 
     Copyright 2019 Gabriel Santamaria
@@ -40,12 +40,12 @@ let compile(code: string) =
         let compiled = instr_to_x86 parsed [] in (* translates it to actual x86 instruction set *)
         let optimised = merge compiled [] in
         let compiled_str = x86_to_str optimised in
-        let file = Stdlib.open_in file in
-        let code = Pervasives.really_input_string file (Stdlib.in_channel_length file) in
-        Printf.close_in file;
+        let file = Stdlib.open_in "skeleton.asm" in
+        let asm = Stdlib.really_input_string file (Stdlib.in_channel_length file) in
+        Stdlib.close_in file;
 
         let reg = Str.regexp "{{code}}" in
-        let final = Str.global_replace reg compiled_str code in
+        let final = Str.global_replace reg compiled_str asm in
 
         let f = Stdlib.open_out file_name in
         Printf.fprintf f "%s\n" final;

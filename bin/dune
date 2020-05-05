@@ -1,0 +1,4 @@
+(executable
+ (public_name Brainfuck)
+ (name main)
+ (libraries Brainfuck))

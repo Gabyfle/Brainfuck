@@ -29,3 +29,4 @@ type x86 =
 
 val instr_to_x86 : instruction list -> x86 list -> x86 list
 val merge : x86 list -> x86 list -> x86 list
+val x86_to_str : x86 list -> string
