@@ -18,7 +18,6 @@
     limitations under the License.
 *)
 
-open Util
 open Tokenizer
 open Parser
 
@@ -30,7 +29,7 @@ open X86
     string -> float
 *)
 let compile(code: string) =
-    let file_path = Sys.argv.(0) in (* 1st argument in the command line have to be the filepath *)
+    (* let file_path = Sys.argv.(0) in 1st argument in the command line have to be the filepath *)
     let file_name = Sys.argv.(1) in
     let start = (Sys.time ()) in (* for performances recording purpose *)
     (* Here's the different steps according to https://en.wikipedia.org/wiki/Compiler *)
@@ -51,6 +50,7 @@ let compile(code: string) =
         Printf.fprintf f "%s\n" final;
         Stdlib.close_out f;
 
+        Printf.printf "Compiled in %f seconds" start
     with e ->
         let msg = Printexc.to_string e in
         Printf.printf "%s" msg (* Display possible error to the user *)

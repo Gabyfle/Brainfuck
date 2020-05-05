@@ -40,7 +40,7 @@ let intrc = [ '+'; '-'; '<'; '>'; '['; ']'; ','; '.' ]
 *)
 let rec type_to_str (instr: instruction list) = 
     let str = ref "" in
-    let rec tokenize (instr: instruction) =
+    let tokenize (instr: instruction) =
         match instr with
             | IPointer -> str := !str ^ ">"
             | DPointer -> str := !str ^ "<"

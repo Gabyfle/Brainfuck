@@ -70,8 +70,8 @@ let findi_from (lst: 'a list) (start: int) (needle: 'a) =
     let rec find l needle =
         match l with
             | [] -> raise Not_found
-            | s :: r when s = needle -> !index
-            | s :: r -> incr index; find r needle
+            | s :: _ when s = needle -> !index
+            | _ :: r -> incr index; find r needle
     in
     find nlst needle
 

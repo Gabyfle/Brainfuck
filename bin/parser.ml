@@ -18,7 +18,6 @@
     limitations under the License.
 *)
 
-open Util
 open Tokenizer
 
 exception Syntax_Error of string
@@ -36,23 +35,23 @@ let parse (code: instruction list) =
     let rec validate_loop (loop: instruction list) =
         match loop with
             | LEnd :: [] -> true
-            | x :: [] -> false
+            | _ :: [] -> false
             | [] -> false
-            | s :: r -> validate_loop r            
+            | _ :: r -> validate_loop r            
     in
     let rec parser (parsed: instruction list) (in_loop: bool) =
         match parsed with
             | Loop(s) :: r -> begin
                 Stdlib.incr loop_count;
                 if (not (validate_loop s)) then
-                    raise (Syntax_Error ("No matching ']' found for '[' at char " ^ (Stdlib.string_of_int !char_count) ^ " in loop " ^ (Pervasives.string_of_int !loop_count)))
+                    raise (Syntax_Error ("No matching ']' found for '[' at char " ^ (Stdlib.string_of_int !char_count) ^ " in loop " ^ (Stdlib.string_of_int !loop_count)))
                 else
                     parser s true; (* parse what's inside the loop and then continue parsing *)
                     parser r false
             end
             | LEnd :: r -> begin
                 match r with
-                    | h :: t -> raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Stdlib.string_of_int !char_count)))
+                    | _ :: _ -> raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Stdlib.string_of_int !char_count)))
                     | [] -> begin
                         if (not in_loop) then
                             raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Stdlib.string_of_int !char_count)))
@@ -60,7 +59,7 @@ let parse (code: instruction list) =
                             Stdlib.incr char_count
                     end
             end
-            | s :: r -> begin
+            | _ :: r -> begin
                 Stdlib.incr char_count;
                 parser r in_loop
             end

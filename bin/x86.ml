@@ -18,8 +18,6 @@
     limitations under the License.
 *)
 
-open Tokenizer
-
 type x86 =
     | Add of int        (* + (1) or - (-1) *)
     | Point of int      (* > (1) or < (-1) *)
@@ -57,12 +55,12 @@ let rec merge (instr: x86 list) (merged: x86 list) =
         | [] -> merged
         | Point(v) :: r -> begin
             match merged with
-                | Point(w) :: t -> merge r ([Point(v + w)] @ merged)
+                | Point(w) :: _-> merge r ([Point(v + w)] @ merged)
                 | _ -> merge r ([Point(v)] @ merged)
         end
         | Add(v)   :: r -> begin
             match merged with
-                | Add(w) :: t -> merge r ([Add(v + w)] @ merged)
+                | Add(w) :: _ -> merge r ([Add(v + w)] @ merged)
                 | _ -> merge r ([Add(v)] @ merged)
         end
         | Loop(l)  :: r -> merge r ((merge l []) @ merged)
