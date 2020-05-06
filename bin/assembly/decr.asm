@@ -1,1 +1,1 @@
-        sub [edx], byte {{amount}}
+        sub byte [edx], {{amount}}

@@ -16,14 +16,10 @@ section .data
     out_of_bounds dw "You tried to access to a memory case that is out of bounds", 0xA
     oob_len equ $ - out_of_bounds
 
-    ; This "pointer" will be used to know which memory case we're working on
-    offset db 1 ; this will be used to point to adresses in stack 
-
 section .text
     global _start
     _start:
         mov edx, esp
-        add edx, offset
 
 {{code}}
 

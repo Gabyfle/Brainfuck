@@ -1,3 +1,1 @@
-        add offset, byte {{amount}}
-
-        add edx, {{amount}}
+        add edx, byte {{amount}}

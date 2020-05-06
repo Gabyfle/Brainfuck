@@ -1,1 +1,1 @@
-        add [edx], byte {{amount}}
+        add byte [edx], {{amount}}
