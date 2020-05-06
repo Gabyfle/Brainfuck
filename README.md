@@ -8,7 +8,32 @@ A Brainfuck compiler, written in **OCaml**
 <p style="text-align: justify;">This repository contains a compiler written entirely in OCaml. The ultimate goal would be to be able to integrate the compiler into other projects so that he can use Brainfuck as he sees fit.</p>
 
 ## Performances
-**Not yet tested**
+### Hello World!
+* Code: [Hello World!](https://en.wikipedia.org/wiki/Brainfuck#Hello_World!)
+* Compile time: 
+* 
+
+
+## Compiling your assembly code
+
+### Requirements
+* [Netwide Assembler](https://www.nasm.us/)
+* A device running a x86-32 or x86-64 architecture
+* A POSIX operating system
+
+### Command line
+To compile the assembly code that Brainfuck produces, type the following in your Terminal :
+
+```
+nasm -felf32 <your_file>.asm
+ld -melf_i386 <your_file>.o -o <program_name>
+```
+
+Then, to execute it, simply run:
+
+```
+./<program_name>
+```
 
 ## Parser feature
 This compiler includes a very simple parser that will detect broken *Brainfuck* code. Here is some examples of how does it tell you that you made a mistake :

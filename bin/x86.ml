@@ -71,7 +71,8 @@ let rec merge (instr: x86 list) (merged: x86 list) =
     translate x86 type elements to actual x86 code
     x86 -> str
 *)
-let x86_to_str (instr: x86 list) = 
+let x86_to_str (instr: x86 list) =
+    Random.self_init ();
     (* replace a certain pattern by a value using regex *)
     let read_replace (file: string) (pattern: string) (replace: string) =
         let asm = Stdlib.open_in file in
@@ -101,7 +102,7 @@ let x86_to_str (instr: x86 list) =
                 let content = convert l "" in
                 let partial = read_replace "assembly/loop.asm" "{{loop_body}}" content in
                 let regex = Str.regexp "{{loop_number}}" in
-                let final = Str.global_replace regex (Stdlib.string_of_int (List.length r)) partial in
+                let final = Str.global_replace regex (Stdlib.string_of_int ((List.length r) + (String.length content) + 2 * (Random.int 30000) * (Random.int 30000))) partial in
                 convert r (code ^ final)
             end
             | Write :: r -> begin

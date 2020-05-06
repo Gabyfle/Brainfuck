@@ -47,15 +47,17 @@ let parse (code: instruction list) =
                     raise (Syntax_Error ("No matching ']' found for '[' at char " ^ (Stdlib.string_of_int !char_count) ^ " in loop " ^ (Stdlib.string_of_int !loop_count)))
                 else
                     parser s true; (* parse what's inside the loop and then continue parsing *)
-                    parser r false
+                    parser r in_loop
             end
             | LEnd :: r -> begin
                 match r with
-                    | _ :: _ -> raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Stdlib.string_of_int !char_count)))
+                    | _ :: _ -> begin
+                        raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Stdlib.string_of_int !char_count)))
+                    end
                     | [] -> begin
-                        if (not in_loop) then
+                        if (not in_loop) then begin
                             raise (Syntax_Error ("No matching '[' found for ']' at char " ^ (Stdlib.string_of_int !char_count)))
-                        else
+                        end else
                             Stdlib.incr char_count
                     end
             end

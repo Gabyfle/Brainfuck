@@ -12,28 +12,15 @@
 %define SYS_EXIT  1
 
 section .data
-    ; Error messages
-    out_of_bounds dw "You tried to access to a memory case that is out of bounds", 0xA
-    oob_len equ $ - out_of_bounds
+    program times 30000 db 0
 
 section .text
     global _start
     _start:
-        mov edx, esp
+        mov edx, program
 
 {{code}}
 
         mov eax, SYS_EXIT
         mov ebx, 0
         int 0x80
-
-    ;_error_OOB: ; out of bounds error
-    ;    mov eax, SYS_WRITE
-    ;    mov ebx, 1
-    ;    mov ecx, out_of_bounds
-    ;    mov edx, oob_len
-    ;    int 0x80
-
-    ;    mov eax, SYS_EXIT ; exit the program after this error
-    ;    mov ebx, 0
-    ;    int 0x80
