@@ -1,3 +1,3 @@
-        add [pointer], byte {{amount}}
+        add offset, byte {{amount}}
 
         add edx, {{amount}}

@@ -18,7 +18,7 @@
     limitations under the License.
 *)
 
-open Tokenizer
+open Lexer
 
 (* Types *)
 exception Syntax_Error of string

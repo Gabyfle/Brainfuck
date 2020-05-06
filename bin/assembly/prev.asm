@@ -1,3 +1,3 @@
-        sub [pointer], byte {{amount}}
+        sub offset, byte {{amount}}
 
         sub edx, {{amount}}

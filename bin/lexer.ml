@@ -1,6 +1,6 @@
 (* 
-    Brainfuck tokenizer
-    tokenizer.ml
+    Brainfuck lexer
+    lexer.ml
 
 
     Copyright 2019 Gabriel Santamaria

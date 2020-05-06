@@ -18,7 +18,7 @@
     limitations under the License.
 *)
 
-open Tokenizer
+open Lexer
 
 type x86 =
     | Add of int        (* + (1) or - (-1) *)

@@ -5,4 +5,4 @@
 
         ; reset EDX to the address of the current working cell
         mov edx, esp
-        add edx, [pointer]
+        add edx, offset

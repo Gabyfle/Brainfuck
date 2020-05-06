@@ -18,7 +18,7 @@
     limitations under the License.
 *)
 
-open Tokenizer
+open Lexer
 open Parser
 
 open X86

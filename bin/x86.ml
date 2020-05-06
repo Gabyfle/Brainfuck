@@ -28,18 +28,18 @@ type x86 =
 (*
     function instr_to_x86
     translates an instruction into a x86 type
-    Tokenizer.instruction list -> x86 list
+    Lexer.instruction list -> x86 list
 *)
-let rec instr_to_x86 (bf: Tokenizer.instruction list) (instr: x86 list)  = 
+let rec instr_to_x86 (bf: Lexer.instruction list) (instr: x86 list)  = 
     match bf with
         | [] -> instr
-        | Tokenizer.IPointer :: r -> instr_to_x86 r ([Point(1)] @ instr)
-        | Tokenizer.DPointer :: r -> instr_to_x86 r ([Point(-1)] @ instr)
-        | Tokenizer.IByte    :: r -> instr_to_x86 r ([Add(1)] @ instr)
-        | Tokenizer.DByte    :: r -> instr_to_x86 r ([Add(-1)] @ instr)
-        | Tokenizer.Out      :: r -> instr_to_x86 r ([Write] @ instr)
-        | Tokenizer.In       :: r -> instr_to_x86 r ([Read] @ instr)
-        | Tokenizer.Loop(s)  :: r -> begin
+        | Lexer.IPointer :: r -> instr_to_x86 r ([Point(1)] @ instr)
+        | Lexer.DPointer :: r -> instr_to_x86 r ([Point(-1)] @ instr)
+        | Lexer.IByte    :: r -> instr_to_x86 r ([Add(1)] @ instr)
+        | Lexer.DByte    :: r -> instr_to_x86 r ([Add(-1)] @ instr)
+        | Lexer.Out      :: r -> instr_to_x86 r ([Write] @ instr)
+        | Lexer.In       :: r -> instr_to_x86 r ([Read] @ instr)
+        | Lexer.Loop(s)  :: r -> begin
             let loop = (instr_to_x86 s []) in
             instr_to_x86 r ([Loop(loop)] @ instr)
         end
