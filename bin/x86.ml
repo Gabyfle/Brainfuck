@@ -18,6 +18,8 @@
     limitations under the License.
 *)
 
+open Parser
+
 type x86 =
     | Add of int        (* + (1) or - (-1) *)
     | Point of int      (* > (1) or < (-1) *)
@@ -29,10 +31,9 @@ type x86 =
 (*
     function translate
     translates an instruction into a x86 type
-    Lexer.instruction list -> x86 list
+    x86 list -> Lexer.instruction list -> x86 list
 *)
-let rec translate (bf: Lexer.instruction list) (instr: x86 list)  = 
-    match bf with
+let rec translate (instr: x86 list) = function
         | [] -> instr
         | Lexer.IPointer :: r -> translate r ([Point(1)] @ instr)
         | Lexer.DPointer :: r -> translate r ([Point(-1)] @ instr)
@@ -100,73 +101,27 @@ let rec get_code (code: string) = function
     (**
         Using system call (sys_write here) we're printing the value at the address which is in EDX
     *)
-    | Write :: r -> get_code (code ^ "mov eax, SYS_WRITE\nmov ebx, 1\nmov ecx, edx\nmov edx, 1\nint 0x80\nmov edx, ecx\n") r
+    | Write :: r -> get_code (code ^ "mov eax, 4\nmov ebx, 1\nmov ecx, edx\nmov edx, 1\nint 0x80\nmov edx, ecx\n") r
     (**
         Using system call (sys_read here) we're reading a value from stdin and we put this value into the cell we're working on
     *)
-    | Read :: r -> get_code (code ^ "mov eax, SYS_READ\nmov ebx, 0\nmov ecx, edx\nmov edx, 1\nint 0x80\nmov edx, ecx\n") r
+    | Read :: r -> get_code (code ^ "mov eax, 3\nmov ebx, 0\nmov ecx, edx\nmov edx, 1\nint 0x80\nmov edx, ecx\n") r
     | _ :: r -> get_code code r
     | [] -> code
 
 
 (*
-    function x86_to_str
-    translate x86 type elements to actual x86 code
-    x86 -> str
+    function gen_asm
+    generate the assembly code given the Lexer representation
+    Lexer.instruction -> string
 *)
-let x86_to_str (instr: x86 list) =
+let gen_asm (instr: Lexer.instruction list) (opt: bool) =
     Random.self_init ();
-    (* replace a certain pattern by a value using regex *)
-    let read_replace (file: string) (pattern: string) (replace: string) =
-        let asm = Stdlib.open_in file in
-        let code = Stdlib.really_input_string asm (Stdlib.in_channel_length asm) in
-        let reg = Str.regexp pattern in
-        Stdlib.close_in asm;
-        Str.global_replace reg replace code
-    in
-    (* converts x86 assembly object type into real assembly code *)
-    let rec convert (assembly: x86 list) (code: string) = 
-        match assembly with
-            | Point(v) :: r -> begin
-                if v == 0 then convert r code
-                else if v > 0 then
-                    convert r (code ^ (read_replace "assembly/next.asm" "{{amount}}" (Stdlib.string_of_int v)))
-                else
-                    convert r (code ^ (read_replace "assembly/prev.asm" "{{amount}}" (Stdlib.string_of_int (-v))))
-            end
-            | Add(v) :: r -> begin
-                if v == 0 then convert r code
-                else if v > 0 then
-                    convert r (code ^ (read_replace "assembly/incr.asm" "{{amount}}" (Stdlib.string_of_int v)))
-                else
-                    convert r (code ^ (read_replace "assembly/decr.asm" "{{amount}}" (Stdlib.string_of_int (-v))))
-            end
-            | Move(v) :: r -> begin
-                convert r (code ^ "")
-            end
-            | Loop(l) :: r -> begin
-                let content = convert l "" in
-                let partial = read_replace "assembly/loop.asm" "{{loop_body}}" content in
-                let regex = Str.regexp "{{loop_number}}" in
-                let final = Str.global_replace regex (Stdlib.string_of_int ((List.length r) + (String.length content) + (Random.int 200) * ((Random.int 30000) mod (Random.int 30000)))) partial in
-                convert r (code ^ final)
-            end
-            | Write :: r -> begin
-                let asm = Stdlib.open_in "assembly/print.asm" in
-                let full = (Stdlib.really_input_string asm (Stdlib.in_channel_length asm)) in
-                Stdlib.close_in asm;
-                convert r (code ^ "\n" ^ full)
-            end
-            | Read :: r -> begin
-                let asm = Stdlib.open_in "assembly/scan.asm" in
-                let full = (Stdlib.really_input_string asm (Stdlib.in_channel_length asm)) in
-                Stdlib.close_in asm;
-                convert r (code ^ "\n" ^ full)
-            end
-            | [] -> code
-    in
-    convert instr ""
+    let intermediate = translate instr in
+    if (opt) then intermediate = merge intermediate;
+    let code = get_code "" intermediate in
 
+    let cell_number = celln instr in
+    let header = Printf.sprintf "global _start\nsection .data\n\tprogram times %s db 0\nsection .text\n\t_start:\n\t\tmov edx, program" cell_number in
 
-let gen_asm =
-    ()
+    Printf.sprintf "%s\n%s\nmov eax, 1\nmov ebx, 0\nint 0x80\n" header code

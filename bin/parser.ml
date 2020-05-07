@@ -23,7 +23,7 @@ open Lexer
 exception Syntax_Error of string
 
 (*
-    Parser
+    function parse
     Find broken / unvalid code and report it
 
     Basically, it'll be looking for problems in loops
@@ -69,3 +69,17 @@ let parse (code: instruction list) =
     in
     ignore (parser code false);
     code
+
+(*
+    function celln
+    computes the number of cells this program uses
+    Lexer.instruction list -> int
+*)
+let celln (instr: instruction list) =
+    let rec count (n: int) = function
+        | IPointer :: r -> count (n + 1) r
+        | DPointer :: r -> count (n - 1) r
+        | _ :: r -> count n r
+        | [] -> n
+    in
+    celln instr

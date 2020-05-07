@@ -19,14 +19,17 @@
 *)
 
 open Lexer
+open Parser
 
 type x86 =
     | Add of int        (* + (1) or - (-1) *)
     | Point of int      (* > (1) or < (-1) *)
+    | Set of int        (* directly sets the value the the cell *)
     | Loop of x86 list  (* List of x86 instructions *)
     | Write             (* sys_write *)
     | Read              (* sys_read *)
 
-val instr_to_x86 : instruction list -> x86 list -> x86 list
+val translate : x86 list -> instruction list -> x86 list
 val merge : x86 list -> x86 list -> x86 list
-val x86_to_str : x86 list -> string
+val get_code : string -> x86 list -> string
+val gen_asm : instruction -> string

@@ -25,3 +25,5 @@ exception Syntax_Error of string
 
 (* Parsing functions *)
 val parse : instruction list -> instruction list
+(* Count number of cells a program uses *)
+val celln : instruction list -> int
