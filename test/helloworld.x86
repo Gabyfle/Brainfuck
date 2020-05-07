@@ -12,7 +12,7 @@
 %define SYS_EXIT  1
 
 section .data
-    program times 30000 db 0
+    program times 1 db 0
 
 section .text
     global _start
