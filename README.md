@@ -7,6 +7,12 @@ A Brainfuck compiler, written in **OCaml**
 ## What is this ?
 <p style="text-align: justify;">This repository contains a compiler written entirely in OCaml. The ultimate goal would be to be able to integrate the compiler into other projects so that he can use Brainfuck as he sees fit.</p>
 
+## How to use it ?
+
+(this hasn't been implemented yet)
+
+Brainfuck is meant to be used in command line.
+
 ## Performances
 
 All these records have been made on the same machine.
@@ -38,6 +44,15 @@ Where `<relative_path>` is the relative path to the program you want to take the
   * Time (seconds): 1.44159
   * Memory usage (Mb): 27.11552
 
+### Pi
+* Code: [Pi](http://esoteric.sange.fi/brainfuck/bf-source/prog/yapi.b)
+
+  **Notice:** Instead of computing only *15* decimals, we're computing *140*.
+
+* Compile time: 0.001349 seconds
+* **Execution:**
+  * Time (seconds): 0.007801
+  * Memory usage (Mb): 26.656768
 
 ## Compiling your assembly code
 

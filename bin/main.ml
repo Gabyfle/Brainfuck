@@ -28,10 +28,7 @@ open X86
     Convert Brainfuck code into assembly x86 code and then compile it using a given compiler
     string -> float
 *)
-let compile(code: string) =
-    (* let file_path = Sys.argv.(0) in 1st argument in the command line have to be the filepath *)
-    let file_name = Sys.argv.(1) in
-    let start = (Sys.time ()) in (* for performances recording purpose *)
+let compile(code: string) (output: string)=
     (* Here's the different steps according to https://en.wikipedia.org/wiki/Compiler *)
     let tokenized = tokenize code in (* tokenize the code *)
     try
@@ -46,14 +43,20 @@ let compile(code: string) =
         let reg = Str.regexp "{{code}}" in
         let final = Str.global_replace reg compiled_str asm in
 
-        let f = Stdlib.open_out file_name in
+        let f = Stdlib.open_out output in
         Printf.fprintf f "%s\n" final;
         Stdlib.close_out f;
 
-        Printf.printf "Compiled in %f seconds\n" start
     with e ->
         let msg = Printexc.to_string e in
         Printf.printf "%s" msg (* Display possible error to the user *)
 
 let () = (* that's a nice hello world. *)
-    compile "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
+    let start = (Sys.time ()) in (* for performances recording purpose *)
+    
+    (* let input_code = Sys.argv.(1) in 1st argument in the command line have to be the filepath *)
+    let input_code = Sys.argv.(1) in
+    compile "";
+
+
+    Printf.printf "Compiled in %f seconds\n" start
