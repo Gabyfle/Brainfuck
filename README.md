@@ -1,6 +1,30 @@
 # Brainfuck
 A Brainfuck compiler, written in **OCaml**
 
+## Table of contents
+- [Brainfuck](#brainfuck)
+  * [What is "Brainfuck" ?](#what-is-brainfuck-)
+  * [What is this ?](#what-is-this-)
+  * [How to use it ?](#how-to-use-it-)
+  * [Performances](#performances)
+    + [Using `benchmarking.py`](#using-benchmarkingpy)
+    + [Hello World!](#hello-world)
+    + [Mandelbrot set](#mandelbrot-set)
+    + [Pi](#pi)
+  * [Compiling your Brainfuck code](#compiling-your-brainfuck-code)
+    + [Brainfuck parameters](#brainfuck-parameters)
+    + [Command line](#command-line)
+  * [Compiling your assembly code](#compiling-your-assembly-code)
+    + [Requirements](#requirements)
+    + [Command line](#command-line-1)
+  * [Parser feature](#parser-feature)
+  * [Optimization](#optimization)
+    + [Optimize redundant instruction (done)](#optimize-redundant-instruction-done)
+    + [Optimize loops (todo)](#optimize-loops-todo)
+    + [Optimize dead code (todo)](#optimize-dead-code-todo)
+  * [Credits](#credits)
+  * [License](#license)
+
 ## What is "Brainfuck" ?
 <p style="text-align: justify;">Brainfuck is an esoteric programming language developed by Urban Müller in 1993. The first particularity of this language is that it contains only 8 instructions that allow, in theory, to create any program (it is said to be Turing-complete). For more information, visit the Wikipedia page of the Brainfuck language: <a href="https://en.wikipedia.org/wiki/Brainfuck">Brainfuck - Wikipedia</a></p>
 
@@ -53,6 +77,35 @@ Where `<relative_path>` is the relative path to the program you want to take the
 * **Execution:**
   * Time (seconds): 0.007801
   * Memory usage (Mb): 26.656768
+
+## Compiling your Brainfuck code
+
+### Brainfuck parameters
+* **Input:** the first parameter that you have to pass to Brainfuck is the path to the file that contains the Brainfuck code to be compiled.
+* **Optional**:
+  * **-o `<filename>`:** this parameter is optional. If not set, the default output name of Brainfuck will be `<input>.asm` where `<input>` is the filename you gived in the first parameter.
+  * **-opt:** If set, activate optimizations
+
+### Command line
+
+To compile a brainfuck code, simply launch this command in your Terminal:
+
+```
+brainfuck <bf_to_compile>
+```
+
+Where `<bf_to_compile>` is the path to the Brainfuck code you want to compile.
+To activate optimizations, add the `-opt` optional parameter:
+
+```
+brainfuck <bf_to_compile> -opt
+```
+
+Finally, if you want to set a specific name to your compiled code file's name, use the `-o` optional parameter:
+
+```
+brainfuck <bf_to_compile> -o <file_name> -opt
+```
 
 ## Compiling your assembly code
 
@@ -118,6 +171,9 @@ Instead of translating it naively into 9 `add reg, 1` (respectively `sub`) assem
 
 ### Optimize loops (todo)
 ### Optimize dead code (todo)
+
+## Credits
+* Table of contents: <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ## License
 All code in this repository is under the Apache 2.0 license, available at the following address: https://www.apache.org/licenses/LICENSE-2.0
