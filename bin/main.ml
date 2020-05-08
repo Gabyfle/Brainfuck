@@ -68,13 +68,37 @@ let compile (code: string) (output: string) (opt: bool) =
         let assembly = gen_asm parsed opt in
         write_to output assembly;
 
-    with e ->
+    with e -> begin
         let msg = Printexc.to_string e in
-        Printf.printf "%s" msg (* Display possible error to the user *)
+        Printf.eprintf "%s" msg (* Display possible error to the user *)
+    end
+
+(*
+    function cli
+    Parse arguments
+    ref string -> ref bool -> ref string
+*)
+let cli (filename: ref string) (opt: ref bool) (output_name: ref string) =
+    let options = [
+        ("-opt", Arg.Unit (fun () -> opt := true), ": turns optimizations on");
+        ("-o", Arg.Set_string output_name, ": changes the output file name");
+    ] in
+    Arg.parse options (fun name -> filename := name) "brainfuck <filename> [-opt] [-o <output>]";
+    try
+        if !filename = "" then
+            (raise (Arg.Bad "You have to provide a file to compile!"))
+    with e -> begin
+        let msg = Printexc.to_string e in
+        Printf.eprintf "An error occurred while trying to parse arguments: %s" msg
+    end
 
 let () = (* Application entry point *)
-    (*
-        TODO: Arguments parser with Arg module from the standard library
-    *)
-    
-    Printf.printf "Compiled in %f seconds\n" start
+    let start = (Sys.time ()) in
+
+    let opt = ref false in
+    let file_path = ref "" in
+    let output_name = ref "a.out" in
+
+    cli file_path opt output_name;
+    compile (read_from !file_path) !output_name !opt;
+    Printf.printf "Compiled in %f seconds\n" ((Sys.time ()) -. start)

@@ -19,7 +19,6 @@
 *)
 
 open Lexer
-open Parser
 
 type x86 =
     | Add of int        (* + (1) or - (-1) *)
@@ -32,4 +31,4 @@ type x86 =
 val translate : x86 list -> instruction list -> x86 list
 val merge : x86 list -> x86 list -> x86 list
 val get_code : string -> x86 list -> string
-val gen_asm : instruction -> string
+val gen_asm : instruction list -> bool -> string

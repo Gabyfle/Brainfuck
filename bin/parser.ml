@@ -87,10 +87,13 @@ let celln (instr: instruction list) =
         end
         | Loop(l) :: r -> begin
             let n = count 0 l in
-            if (n > 0) then 30000 (* set max to 30000 since we do not know how much it can uses *)
+            if (n > 0) then
+                30000 (* set max to 30000 since we do not know how much it can uses *)
+            else
+                count n r
         end
-        | _ :: r -> count n r
-        | [] -> n
+        | _ :: r -> count effective r
+        | [] -> effective
     in
     ignore(count 0 instr);
     !max
