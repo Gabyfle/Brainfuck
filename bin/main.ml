@@ -31,8 +31,6 @@ exception File_Exists of string
     string -> string -> unit
 *)
 let write_to (file: string) (content: string) =
-    if (Sys.file_exists file) then
-        (raise (File_Exists (Printf.sprintf "File %s already exists!" file)));
     let code = Stdlib.open_out file in
     Printf.fprintf code "%s\n" content;
     Stdlib.close_out code
@@ -44,7 +42,7 @@ let write_to (file: string) (content: string) =
 *)
 let read_from (file: string) =
     if not (Sys.file_exists file) then
-        (raise (File_Exists (Printf.sprintf "File %s does not exists!" file)));
+        (raise (File_Exists (Printf.sprintf "File %s does not exists!\n" file)));
     let code = Stdlib.open_in file in
     Stdlib.really_input_string code (Stdlib.in_channel_length code)
 
@@ -55,10 +53,8 @@ let read_from (file: string) =
 *)
 let compile (code: string) (output: string) (opt: bool) =
     (* Here's the different steps according to https://en.wikipedia.org/wiki/Compiler *)
-
-    let tokens = lexer code in (* 1st: get a rough representation of the code *)
-
     try
+        let tokens = lexer code in (* 1st: get a rough representation of the code *)
         let parsed = parse tokens in (* verify that everything is correct with our first representation *)
         (* 
             generate assembly code string from this first valid representation
@@ -76,9 +72,9 @@ let compile (code: string) (output: string) (opt: bool) =
 (*
     function cli
     Parse arguments
-    ref string -> ref bool -> ref string
+    string ref -> bool ref -> string ref
 *)
-let cli (filename: ref string) (opt: ref bool) (output_name: ref string) =
+let cli (filename: string ref) (opt: bool ref) (output_name: string ref) =
     let options = [
         ("-opt", Arg.Unit (fun () -> opt := true), ": turns optimizations on");
         ("-o", Arg.Set_string output_name, ": changes the output file name");
@@ -86,10 +82,12 @@ let cli (filename: ref string) (opt: ref bool) (output_name: ref string) =
     Arg.parse options (fun name -> filename := name) "brainfuck <filename> [-opt] [-o <output>]";
     try
         if !filename = "" then
-            (raise (Arg.Bad "You have to provide a file to compile!"))
+            (raise (Arg.Bad "You have to provide a file to compile!\n"));
+        if !output_name = "" then
+                output_name := Filename.basename !filename
     with e -> begin
         let msg = Printexc.to_string e in
-        Printf.eprintf "An error occurred while trying to parse arguments: %s" msg
+        Printf.eprintf "An error occurred while trying to parse arguments: %s\n" msg
     end
 
 let () = (* Application entry point *)
@@ -97,7 +95,7 @@ let () = (* Application entry point *)
 
     let opt = ref false in
     let file_path = ref "" in
-    let output_name = ref "a.out" in
+    let output_name = ref "gabyfle_brainfuck.asm" in
 
     cli file_path opt output_name;
     compile (read_from !file_path) !output_name !opt;

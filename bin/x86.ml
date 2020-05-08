@@ -67,7 +67,7 @@ let rec merge (merged: x86 list) = function
         | Loop(l)  :: r -> begin
             match l with
                 | Add(v) :: [] when v < 0 -> merge ([Set(0)] @ merged) r
-                | _ -> merge ([Loop(merge l [])] @ merged) r
+                | _ -> merge ([Loop(merge [] l)] @ merged) r
         end
         | s :: r -> merge ([s] @ merged) r
 
@@ -90,11 +90,11 @@ let rec get_code (code: string) = function
     (*
         We move the value (byte) v at the address which is in EDX (the cell we're working on)
     *)
-    | Set(v) :: r -> get_code (code ^ Printf.sprintf "mov [edx], %d\n" v) r
+    | Set(v) :: r -> get_code (code ^ Printf.sprintf "mov [edx], byte %d\n" v) r
     | Loop(l) :: r -> begin
         let seed = ((Random.int 50000) * (Random.int 50000) + (Random.int 50000)) in
         let id = Stdlib.string_of_int (Hashtbl.seeded_hash seed "loop") in
-        let loop_code = Printf.sprintf "%s:\tcmp [edx], byte 0\n\tjz %s\t%s jmp %s%s:\n" ("s" ^ id) ("e" ^ id) (get_code "" l) ("s" ^ id) ("e" ^ id) in
+        let loop_code = Printf.sprintf "%s:\n\tcmp [edx], byte 0\n\tjz %s\n\t%s jmp %s\n%s:\n" ("s" ^ id) ("e" ^ id) (get_code "" l) ("s" ^ id) ("e" ^ id) in
         get_code (code ^ loop_code) r
     end
     (*
@@ -116,9 +116,10 @@ let rec get_code (code: string) = function
 *)
 let gen_asm (instr: Lexer.instruction list) (opt: bool) =
     Random.self_init ();
-    let intermediate = translate [] instr in
-    if (opt) then ignore(intermediate = merge [] intermediate);
-    let code = get_code "" intermediate in
+    let intermediate = ref (translate [] instr) in
+    if (opt) then
+        intermediate := merge [] !intermediate;
+    let code = get_code "" !intermediate in
 
     let cell_number = celln instr in
     let header = Printf.sprintf "global _start\nsection .data\n\tprogram times %d db 0\nsection .text\n\t_start:\n\t\tmov edx, program" cell_number in
