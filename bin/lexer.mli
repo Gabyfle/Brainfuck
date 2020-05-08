@@ -34,4 +34,4 @@ val intrc : char list
 val type_to_str : instruction list -> string
 val char_to_type : char -> instruction
 val clear_code : string -> string
-val tokenize : string -> instruction list
+val lexer : string -> instruction list

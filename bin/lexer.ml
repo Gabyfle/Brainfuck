@@ -87,11 +87,11 @@ let clear_code (code: string) =
     !str
 
 (*
-    function tokenize
+    function lexer
     convert a brainfuck string into a list of instructions
     string -> instructions list
 *)
-let tokenize (code: string) =
+let lexer (code: string) =
     let estring = Util.explode (clear_code code) in (* exploded string *)
     let rec real_length (lst: instruction list) =
         match lst with

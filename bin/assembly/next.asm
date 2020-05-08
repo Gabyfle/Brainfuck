@@ -1,1 +1,0 @@
-        add edx, byte {{amount}}

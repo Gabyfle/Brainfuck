@@ -32,8 +32,7 @@ let parse (code: instruction list) =
     let char_count = ref 1 in
     let loop_count = ref 0 in
 
-    let rec validate_loop (loop: instruction list) =
-        match loop with
+    let rec validate_loop = function
             | LEnd :: [] -> true
             | _ :: [] -> false
             | [] -> false
@@ -76,10 +75,22 @@ let parse (code: instruction list) =
     Lexer.instruction list -> int
 *)
 let celln (instr: instruction list) =
-    let rec count (n: int) = function
-        | IPointer :: r -> count (n + 1) r
-        | DPointer :: r -> count (n - 1) r
+    let max = ref 0 in 
+    let rec count (effective: int) = function
+        | IPointer :: r -> begin
+            if (Int.abs (!max + 1)) > (Int.abs !max) then max := !max + 1;
+            count (effective + 1) r
+        end
+        | DPointer :: r -> begin
+            if (Int.abs (!max - 1)) > (Int.abs !max) then max := !max - 1;
+            count (effective - 1) r
+        end
+        | Loop(l) :: r -> begin
+            let n = count 0 l in
+            if (n > 0) then 30000 (* set max to 30000 since we do not know how much it can uses *)
+        end
         | _ :: r -> count n r
         | [] -> n
     in
-    celln instr
+    ignore(count 0 instr);
+    !max

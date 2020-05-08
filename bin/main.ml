@@ -23,40 +23,58 @@ open Parser
 
 open X86
 
+exception File_Exists of string
+
+(*
+    function write_to
+    Writes a content to a file
+    string -> string -> unit
+*)
+let write_to (file: string) (content: string) =
+    if (Sys.file_exists file) then
+        (raise (File_Exists (Printf.sprintf "File %s already exists!" file)));
+    let code = Stdlib.open_out file in
+    Printf.fprintf code "%s\n" content;
+    Stdlib.close_out code
+
+(*
+    function read_from
+    Read contents from a file
+    string -> string
+*)
+let read_from (file: string) =
+    if not (Sys.file_exists file) then
+        (raise (File_Exists (Printf.sprintf "File %s does not exists!" file)));
+    let code = Stdlib.open_in file in
+    Stdlib.really_input_string code (Stdlib.in_channel_length code)
+
 (*
     function compile
-    Convert Brainfuck code into assembly x86 code and then compile it using a given compiler
+    Convert Brainfuck code into assembly x86 code
     string -> float
 *)
-let compile(code: string) (output: string)=
+let compile (code: string) (output: string) (opt: bool) =
     (* Here's the different steps according to https://en.wikipedia.org/wiki/Compiler *)
-    let tokenized = tokenize code in (* tokenize the code *)
+
+    let tokens = lexer code in (* 1st: get a rough representation of the code *)
+
     try
-        let parsed = parse tokenized in (* now let's parse it *)
-        let compiled = instr_to_x86 parsed [] in (* translates it to actual x86 instruction set *)
-        let optimised = merge compiled [] in
-        let compiled_str = x86_to_str optimised in
-        let file = Stdlib.open_in "skeleton.asm" in
-        let asm = Stdlib.really_input_string file (Stdlib.in_channel_length file) in
-        Stdlib.close_in file;
-
-        let reg = Str.regexp "{{code}}" in
-        let final = Str.global_replace reg compiled_str asm in
-
-        let f = Stdlib.open_out output in
-        Printf.fprintf f "%s\n" final;
-        Stdlib.close_out f;
+        let parsed = parse tokens in (* verify that everything is correct with our first representation *)
+        (* 
+            generate assembly code string from this first valid representation
+            actually it first converts it to a ASM representation then
+            it does optimization if they are active and generate the ASM code as a string
+        *)
+        let assembly = gen_asm parsed opt in
+        write_to output assembly;
 
     with e ->
         let msg = Printexc.to_string e in
         Printf.printf "%s" msg (* Display possible error to the user *)
 
-let () = (* that's a nice hello world. *)
-    let start = (Sys.time ()) in (* for performances recording purpose *)
+let () = (* Application entry point *)
+    (*
+        TODO: Arguments parser with Arg module from the standard library
+    *)
     
-    (* let input_code = Sys.argv.(1) in 1st argument in the command line have to be the filepath *)
-    let input_code = Sys.argv.(1) in
-    compile "";
-
-
     Printf.printf "Compiled in %f seconds\n" start
