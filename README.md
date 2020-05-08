@@ -54,6 +54,35 @@ Where `<relative_path>` is the relative path to the program you want to take the
   * Time (seconds): 0.007801
   * Memory usage (Mb): 26.656768
 
+## Compiling your Brainfuck code
+
+### Brainfuck parameters
+* **Input:** the first parameter that you have to pass to Brainfuck is the path to the file that contains the Brainfuck code to be compiled.
+* **Optional**:
+  * **-o `<filename>`:** this parameter is optional. If not set, the default output name of Brainfuck will be `<input>.asm` where `<input>` is the filename you gived in the first parameter.
+  * **-opt:** If set, activate optimizations
+
+### Command line
+
+To compile a brainfuck code, simply launch this command in your Terminal:
+
+```
+brainfuck <bf_to_compile>
+```
+
+Where `<bf_to_compile>` is the path to the Brainfuck code you want to compile.
+To activate optimizations, add the `-opt` optional parameter:
+
+```
+brainfuck <bf_to_compile> -opt
+```
+
+Finally, if you want to set a specific name to your compiled code file's name, use the `-o` optional parameter:
+
+```
+brainfuck <bf_to_compile> -o <file_name> -opt
+```
+
 ## Compiling your assembly code
 
 ### Requirements
