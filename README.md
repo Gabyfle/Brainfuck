@@ -49,10 +49,10 @@ All these records have been made on the same machine.
 This script isn't supposed to be used outside of this repository but if you want to use it, you can still, by launching this command:
 
 ```
-python3 benchmarking.py -program <relative_path>
+python3 benchmarking.py -program <relative_path> -amount <amount_of_time>
 ```
 
-Where `<relative_path>` is the relative path to the program you want to take the bench from.
+Where `<relative_path>` is the relative path to the program you want to take the bench from and `<amount_of_time>` is the amount of time the script should reproduce the benchmarks (the bigger it is, the more accurate your result will be).
 
 ### Hello World!
 * Code: [Hello World!](https://en.wikipedia.org/wiki/Brainfuck#Hello_World!)
