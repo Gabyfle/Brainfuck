@@ -19,8 +19,8 @@
 *)
 
 (* Util functions module *)
-val get_code : string -> string list
 val sconcat : string list -> string
 val trimi : 'a list -> int -> 'a list
 val findi_from : 'a list -> int -> 'a -> int
 val explode : string -> char list
+val tappend : 'a list -> 'a list -> 'a list

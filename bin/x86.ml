@@ -58,16 +58,21 @@ let rec merge (merged: x86 list) = function
             match merged with
                 | Point(w) :: t -> merge ([Point(v + w)] @ t) r
                 | t -> merge ([Point(v)] @ t) r
-        end
-        | Add(v)   :: r -> begin
+            end
+        | Add(v) :: r -> begin
             match merged with
                 | Add(w) :: t -> merge ([Add(v + w)] @ t) r
                 | t -> merge ([Add(v)] @ t) r
         end
-        | Loop(l)  :: r -> begin
+        | Loop(l) :: r -> begin
             match l with
                 | Add(v) :: [] when v < 0 -> merge ([Set(0)] @ merged) r
                 | _ -> merge ([Loop(merge [] l)] @ merged) r
+        end
+        | Read :: r -> begin
+            match merged with
+                | Read :: _ -> merge merged r
+                | _ -> merge ([Read] @ merged) r
         end
         | s :: r -> merge ([s] @ merged) r
 

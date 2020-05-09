@@ -54,19 +54,22 @@ let read_from (file: string) =
 let compile (code: string) (output: string) (opt: bool) =
     (* Here's the different steps according to https://en.wikipedia.org/wiki/Compiler *)
     try
+        Printf.printf "Starting to lex...\n";
         let tokens = lexer code in (* 1st: get a rough representation of the code *)
+        Printf.printf "Starting to parse...\n";
         let parsed = parse tokens in (* verify that everything is correct with our first representation *)
         (* 
             generate assembly code string from this first valid representation
             actually it first converts it to a ASM representation then
             it does optimization if they are active and generate the ASM code as a string
         *)
+        Printf.printf "Generating assembly code...\n";
         let assembly = gen_asm parsed opt in
         write_to output assembly;
 
     with e -> begin
         let msg = Printexc.to_string e in
-        Printf.eprintf "%s" msg (* Display possible error to the user *)
+        Printf.eprintf "%s\n" msg (* Display possible error to the user *)
     end
 
 (*

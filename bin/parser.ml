@@ -66,7 +66,7 @@ let parse (code: instruction list) =
             end
             | [] -> ()
     in
-    ignore (parser code false);
+    parser code false;
     code
 
 (*
@@ -75,14 +75,15 @@ let parse (code: instruction list) =
     Lexer.instruction list -> int
 *)
 let celln (instr: instruction list) =
-    let max = ref 0 in 
+    let plus = ref 0 in
+    let minus = ref 0 in
     let rec count (effective: int) = function
         | IPointer :: r -> begin
-            if (Int.abs (!max + 1)) > (Int.abs !max) then max := !max + 1;
+            plus := !plus + 1;
             count (effective + 1) r
         end
         | DPointer :: r -> begin
-            if (Int.abs (!max - 1)) > (Int.abs !max) then max := !max - 1;
+            minus := !minus - 1;
             count (effective - 1) r
         end
         | Loop(l) :: r -> begin
@@ -90,10 +91,11 @@ let celln (instr: instruction list) =
             if (n > 0) then
                 30000 (* set max to 30000 since we do not know how much it can uses *)
             else
-                count n r
+            count (n + effective) r
         end
         | _ :: r -> count effective r
         | [] -> effective
     in
     ignore(count 0 instr);
-    !max
+    if (Int.abs !minus) > !plus then !minus
+    else !plus

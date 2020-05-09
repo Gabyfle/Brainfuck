@@ -93,11 +93,10 @@ let clear_code (code: string) =
 *)
 let lexer (code: string) =
     let estring = Util.explode (clear_code code) in (* exploded string *)
-    let rec real_length (lst: instruction list) =
-        match lst with
-            | [] -> 0
-            | Loop(l) :: r -> (real_length l) + (real_length r)
-            | _ :: r -> 1 + real_length r
+    let rec real_length (length: int) = function
+            | [] -> length
+            | Loop(l) :: r -> real_length (length + (real_length 0 l)) r
+            | _ :: r -> real_length (length + 1) r
     in
     let rec tokenizer (cl: char list) (program: instruction list) =
         match cl with
@@ -106,10 +105,10 @@ let lexer (code: string) =
                 match s with
                     | c when c = '[' ->
                         let loop = (tokenizer r []) in
-                        let ncl = Util.trimi r (real_length loop) in
-                        tokenizer ncl (program @ [Loop([(char_to_type c)] @ loop)])
-                    | c when c = ']' -> program @ [(char_to_type c)] (* if this is not present, it'll be reported at the analysis *)
-                    | c -> tokenizer r (program @ [(char_to_type c)])
+                        let ncl = Util.trimi r (real_length 0 loop) in
+                        tokenizer ncl (Util.tappend program [Loop(Util.tappend [(char_to_type c)] loop)])
+                    | c when c = ']' -> Util.tappend program [(char_to_type c)] (* if this is not present, it'll be reported at the analysis *)
+                    | c -> tokenizer r (Util.tappend program [(char_to_type c)])
             end
     in
     tokenizer estring []

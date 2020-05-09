@@ -19,21 +19,6 @@
 *)
 
 (* Util functions module *)
-(*
-    function get_code
-    gets code from a file
-    string -> string list
-*)
-let get_code (file: string) =
-    let lines = ref [] in
-    let io = open_in file in
-    try
-        while true; do
-            lines := input_line io :: !lines
-        done; !lines
-    with End_of_file ->
-        close_in io;
-        List.rev !lines
 
 (*
     function sconcat
@@ -87,3 +72,16 @@ let explode string =
         else xpld (i - 1) (string.[i] :: list)
     in
     xpld ((String.length string) - 1) []
+
+(*
+    function tappend
+    Tail-recursive version of the @ operator
+    'a list -> 'a list -> 'a list
+*)
+let tappend l1 l2 =
+    let rec append acc l1 l2 = match l1, l2 with
+        | [], [] -> List.rev acc
+        | h :: t, l -> append (h :: acc) t l
+        | [], h :: t -> append (h :: acc) [] t
+    in
+    append [] l1 l2
