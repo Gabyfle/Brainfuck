@@ -49,7 +49,6 @@ Where `<relative_path>` is the relative path to the program you want to take the
 * Compile time: 0.001737 seconds
 * **Execution:**
   * Time (seconds): 0.00086
-  * Memory usage (Mb): 27.099136
 
 ### Mandelbrot set
 * Code: [Mandelbrot](https://github.com/erikdubbelboer/brainfuck-jit/blob/master/mandelbrot.bf)
