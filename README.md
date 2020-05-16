@@ -55,7 +55,6 @@ Where `<relative_path>` is the relative path to the program you want to take the
 * Compile time: 0.003110 seconds
 * **Execution:**
   * Time (seconds): 1.44159
-  * Memory usage (Mb): 27.11552
 
 ### Pi
 * Code: [Pi](http://esoteric.sange.fi/brainfuck/bf-source/prog/yapi.b)
