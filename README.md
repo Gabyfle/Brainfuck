@@ -64,7 +64,6 @@ Where `<relative_path>` is the relative path to the program you want to take the
 * Compile time: 0.001349 seconds
 * **Execution:**
   * Time (seconds): 0.007801
-  * Memory usage (Mb): 26.656768
 
 ## Compiling your Brainfuck code
 
